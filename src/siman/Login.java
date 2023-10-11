@@ -274,7 +274,6 @@ public class Login extends javax.swing.JFrame {
             for (int i = 0; i < c.length; i++) {
                 passwordFinal  += String.valueOf(c[i]);
             }
-
             String passwordEncriptada=DigestUtils.md5Hex(passwordFinal);
             String sql = "SELECT * from usuarios where nombre_usuario ='" +usuario+ "' and password_usuario='"+passwordEncriptada+"' COLLATE Latin1_General_CS_AS";
             Statement st = con.createStatement();
@@ -286,9 +285,9 @@ public class Login extends javax.swing.JFrame {
             }
             if(rs.next()){
                 this.dispose();
-                 JOptionPane.showMessageDialog(null, "Bienvenido " + usuario, "Ingrese sus datos", JOptionPane.INFORMATION_MESSAGE);
-                //Principal principal = new Principal(txt_usuario.getText());
-                // principal.setVisible(true);
+                    JOptionPane.showMessageDialog(null, "Bienvenido " + usuario, "Ingrese sus datos", JOptionPane.INFORMATION_MESSAGE);
+                    Principal principal = new Principal(txt_usuario.getText());
+                    principal.setVisible(true);
             }
             else{
                 Toolkit.getDefaultToolkit().beep();
