@@ -25,12 +25,11 @@ public class Queries {
         this.con = ConexionBD.obtenerConexion();
     }
     
-    public ArrayList<String> llenarColaboradores(String nombreSucursal) throws SQLException{
+    public ArrayList<String> llenarColaboradores() throws SQLException{
          ArrayList<String> lista = new ArrayList<String>();
          String q= "SELECT c.id_colaborador, c.nombre_colaborador, c.apellido_colaborador, "
                  + "c.numero_identidad_colaborador, s.nombre_sucursal from colaboradores as c "
-                 + "join sucursales as s on c.id_sucursal = s.id_sucursal "
-                 + "where s.nombre_sucursal = '"+nombreSucursal+"'";
+                 + "join sucursales as s on c.id_sucursal = s.id_sucursal ";
          Statement st;
          st = con.createStatement();
          try{

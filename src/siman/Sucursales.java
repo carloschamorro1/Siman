@@ -32,6 +32,10 @@ public class Sucursales extends javax.swing.JFrame {
     Connection con = null;
     ArrayList<String> colaboradores = new ArrayList<String>();
     int id_colaborador;
+    int id_sucursal;
+    int cifrasDecimales;
+    String nombreColaborador;
+    String nombreSucursal;
 
     /**
      * Creates new form Sucursales
@@ -41,6 +45,7 @@ public class Sucursales extends javax.swing.JFrame {
         informacionGeneral();
         holders();
         llenarSucursales();
+        desactivarCampos();
         lbl_nombreUsuario.setText(nombreUsuario);
         this.con = ConexionBD.obtenerConexion();
         //((JSpinner.DefaultEditor) spi_cantidadProducto.getEditor()).getTextField().setEditable(false);
@@ -51,8 +56,27 @@ public class Sucursales extends javax.swing.JFrame {
         informacionGeneral();
         holders();
         llenarSucursales();
+        desactivarCampos();
         lbl_nombreUsuario.setText("nombreUsuario");
         this.con = ConexionBD.obtenerConexion();
+    }
+    
+    public void desactivarCampos(){
+        cmb_colaboradores.setEnabled(false);
+        txt_distancia.setEnabled(false);
+        btn_asignar.setEnabled(false);
+    }
+    
+    public void activarCampos(){
+        cmb_colaboradores.setEnabled(true);
+        txt_distancia.setEnabled(true);
+        btn_asignar.setEnabled(true);
+    }
+    
+    public void activarCamposSinDistancia(){
+        cmb_colaboradores.setEnabled(true);
+        btn_asignar.setEnabled(true);
+        
     }
 
     private void informacionGeneral() {
@@ -99,10 +123,56 @@ public class Sucursales extends javax.swing.JFrame {
        return -1;
     }
     
-    private void llenarColaboradores(String nombreSucursal) {
+    public String capturarNombreColaborador(int id_colaborador){
+        try {
+            Statement st = con.createStatement();
+            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '"+id_colaborador+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                nombreColaborador = rs.getString("nombre_colaborador") + " " + rs.getString("apellido_colaborador");
+                return nombreColaborador;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return "";
+    }
+    
+    public String capturarNombreSucursal(int id_sucursal){
+        try {
+            Statement st = con.createStatement();
+            String sql = "select nombre_sucursal from sucursales where id_sucursal = '"+id_sucursal+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                nombreSucursal = rs.getString("nombre_sucursal");
+                return nombreSucursal;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return "";
+    }
+    
+    public int capturarIdSucursal(String nombreSucursal){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_sucursal from sucursales where nombre_sucursal = '"+nombreSucursal+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_sucursal"));
+                return id;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
+    }
+    
+    private void llenarColaboradores() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
-            lista = new Queries().llenarColaboradores(nombreSucursal);
+            lista = new Queries().llenarColaboradores();
             for (int i = 0; i < lista.size(); i++) {
                 cmb_colaboradores.addItem(lista.get(i));
             }
@@ -160,22 +230,24 @@ public class Sucursales extends javax.swing.JFrame {
     }
 
     private boolean estaVacio() {
-        /*if (txt_nombreProducto.getText().equals("Ingrese el nombre del producto")) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese el nombre del producto", "Ingrese el nombre", JOptionPane.INFORMATION_MESSAGE);
+        if (txt_distancia.getText().equals("Ingrese la distancia")) {
+            JOptionPane.showMessageDialog(this, "Por favor ingrese la distancia", "Ingrese la distancia", JOptionPane.INFORMATION_MESSAGE);
             return true;
         }
-        if (spi_cantidadProducto.getValue().equals("0")) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese la cantidad del producto", "Ingrese la cantidad", JOptionPane.INFORMATION_MESSAGE);
+        return false;
+    }
+    
+    private boolean validarDistancia() {
+        if (Double.parseDouble(txt_distancia.getText()) == 0) {
+            JOptionPane.showMessageDialog(this, "La distancia no puede ser cero (0).", "Cero no permitido", JOptionPane.ERROR_MESSAGE);
             return true;
         }
-        if (cmb_colaborador.getSelectedItem().equals("Seleccione el movimiento")) {
-            JOptionPane.showMessageDialog(this, "Por favor seleccione el tipo de movimiento", "Seleccione el tipo de movimiento", JOptionPane.INFORMATION_MESSAGE);
+        else if (Double.parseDouble(txt_distancia.getText()) > 50) {
+            JOptionPane.showMessageDialog(this, "La distancia no puede ser mayor a cincuenta (50).", "Máximo de la distancia", JOptionPane.ERROR_MESSAGE);
+            txt_distancia.setText("");
+            txt_distancia.requestFocus();
             return true;
         }
-        if (txt_distancia.getText().equals("Ingrese el precio del producto")) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese el precio del producto", "Ingrese el precio", JOptionPane.INFORMATION_MESSAGE);
-            return true;
-        }*/
         return false;
     }
 
@@ -185,44 +257,34 @@ public class Sucursales extends javax.swing.JFrame {
         txt_distancia.setText("");
     }
 
-    private boolean existeProducto() {
-        /*try {
+    private void restablecer() {
+        limpiar();
+        holders();
+        desactivarCampos();
+    }
+
+    public boolean sucursalYaAsignadaAColaborador(){
+        try {
             Statement st = con.createStatement();
-            String sql = "Select nombreproducto from inventario where nombreproducto = '" + txt_nombreProducto.getText() + "'";
+            String sql = "select * from asignaciones where id_colaborador = '"+id_colaborador+"' and id_sucursal = '"+id_sucursal+"'";
             ResultSet rs = st.executeQuery(sql);
-            if (rs.next()) {
-                JOptionPane.showMessageDialog(null, "El Producto: " + txt_nombreProducto.getText() + " ya existe", "Este producto ¡Ya existe!", JOptionPane.INFORMATION_MESSAGE);
+            if(rs.next()){
+                JOptionPane.showMessageDialog(null, "El colaborador ya tiene asignada esta sucursal", "Sucursal ya asignada", JOptionPane.INFORMATION_MESSAGE);
+                txt_distancia.setText("");
+                txt_distancia.setEnabled(false);
+                cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
                 return true;
-            } else {
+            }
+            else{
                 return false;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        }
         return false;
     }
-
-    private void restablecer() {
-        limpiar();
-        holders();
-        btn_asignar.setEnabled(true);
-    }
-
-    private String capturarIdEmpleado() {
-        String idEmpleado = "";
-        try {
-            Statement st = con.createStatement();
-            String sql = "Select idempleado from empleado where usuario = '" + lbl_nombreUsuario.getText() + "'";
-            ResultSet rs = st.executeQuery(sql);
-            if (rs.next()) {
-                idEmpleado = rs.getString("idempleado");
-                return idEmpleado;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return idEmpleado;
-    }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -241,11 +303,12 @@ public class Sucursales extends javax.swing.JFrame {
         lbl_home = new javax.swing.JLabel();
         lbl_usuario = new javax.swing.JLabel();
         lbl_tituloSucursales = new javax.swing.JLabel();
-        lbl_sucursal = new javax.swing.JLabel();
+        lbl_limpiar = new javax.swing.JLabel();
         lbl_distancia = new javax.swing.JLabel();
         lbl_colaborador = new javax.swing.JLabel();
         cmb_colaboradores = new javax.swing.JComboBox<>();
         cmb_sucursales = new javax.swing.JComboBox<>();
+        lbl_sucursal1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -275,7 +338,7 @@ public class Sucursales extends javax.swing.JFrame {
         btn_asignar.setBackground(new java.awt.Color(205, 63, 145));
         btn_asignar.setFont(new java.awt.Font("Roboto Black", 0, 24)); // NOI18N
         btn_asignar.setForeground(new java.awt.Color(255, 255, 255));
-        btn_asignar.setText("Agregar");
+        btn_asignar.setText("Asignar");
         btn_asignar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btn_asignar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -305,10 +368,11 @@ public class Sucursales extends javax.swing.JFrame {
         lbl_tituloSucursales.setFont(new java.awt.Font("Roboto Black", 0, 48)); // NOI18N
         lbl_tituloSucursales.setText("Sucursales");
 
-        lbl_sucursal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/ubicacion.png"))); // NOI18N
-        lbl_sucursal.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lbl_sucursalMousePressed(evt);
+        lbl_limpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/clean.png"))); // NOI18N
+        lbl_limpiar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lbl_limpiar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_limpiarMouseClicked(evt);
             }
         });
 
@@ -346,76 +410,75 @@ public class Sucursales extends javax.swing.JFrame {
             }
         });
 
+        lbl_sucursal1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/ubicacion.png"))); // NOI18N
+        lbl_sucursal1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                lbl_sucursal1MousePressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(17, 17, 17)
                 .addComponent(lbl_usuario)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbl_nombreUsuario)
+                .addGap(234, 234, 234)
+                .addComponent(lbl_tituloSucursales)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbl_home)
+                .addGap(40, 40, 40))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(392, 392, 392)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_sucursal1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(214, 214, 214)
-                        .addComponent(lbl_tituloSucursales)
-                        .addGap(0, 609, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbl_home)
-                        .addGap(21, 21, 21))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(76, 76, 76)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lbl_sucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(44, 44, 44)
+                .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(405, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(47, 47, 47)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lbl_home, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGap(21, 21, 21)
-                                    .addComponent(lbl_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(lbl_tituloSucursales, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(74, 74, 74))
+                            .addComponent(lbl_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_home, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(40, 40, 40)
-                        .addComponent(lbl_nombreUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(64, 64, 64)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbl_tituloSucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_nombreUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(133, 133, 133)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_sucursal1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(37, 37, 37)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(33, 33, 33)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(43, 43, 43)
-                        .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lbl_sucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(205, Short.MAX_VALUE))
+                            .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(43, 43, 43)
+                .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(126, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout kGradientPanel1Layout = new javax.swing.GroupLayout(kGradientPanel1);
@@ -471,10 +534,6 @@ public class Sucursales extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
-    private void lbl_sucursalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_sucursalMousePressed
-        cmb_sucursales.requestFocus();
-    }//GEN-LAST:event_lbl_sucursalMousePressed
-
     private void lbl_distanciaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_distanciaMousePressed
         txt_distancia.requestFocus();
     }//GEN-LAST:event_lbl_distanciaMousePressed
@@ -489,32 +548,30 @@ public class Sucursales extends javax.swing.JFrame {
             if (estaVacio()) {
                 return;
             }
-
-            if (existeProducto()) {
+            
+            if(validarDistancia()){
                 return;
             }
-
-            Calendar f;
-            f = Calendar.getInstance();
-            int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
-            String fecha = (año + "-" + mes + "-" + d);
-
+            
+            if(sucursalYaAsignadaAColaborador()){
+                return;
+            }
+            
             PreparedStatement ps;
             ResultSet rs;
 
-            ps = con.prepareStatement("INSERT INTO inventario (nombreproducto, idempleado, cantidadstock, fechaintroduccion,"
-                    + "tipomovimiento, precio)"
-                    + "VALUES(?,?,?,?,?,?)");
-            //ps.setString(1, txt_nombreProducto.getText());
-            String idEmpleado = capturarIdEmpleado();
-            ps.setString(2, idEmpleado);
-            //ps.setString(3, spi_cantidadProducto.getValue().toString());
-            ps.setString(4, fecha);
-            ps.setString(5, cmb_colaboradores.getSelectedItem().toString().substring(0, 1).toLowerCase());
-            ps.setString(6, txt_distancia.getText());
+            ps = con.prepareStatement("INSERT INTO asignaciones (id_colaborador, id_sucursal, distancia) " +
+                                       "VALUES(?,?,?)");
+            ps.setInt(1, id_colaborador);
+            ps.setInt(2, id_sucursal);
+            ps.setDouble(3, Double.parseDouble(txt_distancia.getText().trim()));
+           
             int res = ps.executeUpdate();
             if (res > 0) {
-                JOptionPane.showMessageDialog(this, "Producto agregado");
+                nombreColaborador = capturarNombreColaborador(id_colaborador);
+                nombreSucursal = capturarNombreSucursal(id_sucursal);
+                JOptionPane.showMessageDialog(this, "Se ha asigando la distancia: " +txt_distancia.getText().trim()
+                        + "km a el/la empleado/a: " + nombreColaborador + " en la sucursal: " + nombreSucursal +".");
                 restablecer();
             }
         } catch (Exception e) {
@@ -526,48 +583,83 @@ public class Sucursales extends javax.swing.JFrame {
 
     private void txt_distanciaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_distanciaKeyTyped
         char a=evt.getKeyChar();
+        
+        if(evt.getKeyChar() == 46){
+            if(txt_distancia.getText().equals("")){
+                evt.consume();
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+            if(txt_distancia.getText().contains(".")){
+                evt.consume();
+                Toolkit.getDefaultToolkit().beep();
+                return;
+            }
+        }
+        
+        
+        if(txt_distancia.getText().length() >=5){
+            evt.consume();
+            Toolkit.getDefaultToolkit().beep();
+            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos","Límite de entrada",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
         if (evt.getKeyChar() == 8 || evt.getKeyChar() == 127 ||
             evt.getKeyChar() == 0 || evt.getKeyChar() == 3 || evt.getKeyChar() == 22
-            || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 46 || evt.getKeyChar() == 44) {
+            || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 44 || evt.getKeyChar() == 46) {
             return;
         }
 
-        if(txt_distancia.getText().length() >=10){
-            evt.consume();
-            Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos");
-        }
         if(Character.isLetter(a) || !Character.isLetterOrDigit(a)){
             evt.consume();
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Sólo numeros");
+            JOptionPane.showMessageDialog(null, "Sólo numeros","Restricción de entrada",JOptionPane.ERROR_MESSAGE);
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_distanciaKeyTyped
 
     private void cmb_sucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_sucursalesActionPerformed
         limpiarColaboradores();
-        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){    
+        
+        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){
+                activarCamposSinDistancia();
                 String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
                 String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
                 String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
                 String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
                 String nombreSucursal = partesInformacionSucursal[0].trim();
-                llenarColaboradores(nombreSucursal);  
-            }
+                llenarColaboradores();
+                id_sucursal = capturarIdSucursal(nombreSucursal);
+            }else{
+            restablecer();
+            desactivarCampos();
+        }
     }//GEN-LAST:event_cmb_sucursalesActionPerformed
 
     private void cmb_colaboradoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_colaboradoresActionPerformed
         if(cmb_colaboradores.getItemCount() ==0){
             return;
         }
-        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){    
+        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){
+            txt_distancia.setEnabled(true);
             String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
             String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
             String numeroIdentidad = partesInformacionSucursal[2].trim();
             id_colaborador = capturarIdColaborador(numeroIdentidad);
             }
+        else{
+            txt_distancia.setEnabled(false);
+        }
     }//GEN-LAST:event_cmb_colaboradoresActionPerformed
+
+    private void lbl_sucursal1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_sucursal1MousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbl_sucursal1MousePressed
+
+    private void lbl_limpiarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_limpiarMouseClicked
+        restablecer();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbl_limpiarMouseClicked
 
     /**
      * @param args the command line arguments
@@ -618,8 +710,9 @@ public class Sucursales extends javax.swing.JFrame {
     private javax.swing.JLabel lbl_colaborador;
     private javax.swing.JLabel lbl_distancia;
     private javax.swing.JLabel lbl_home;
+    private javax.swing.JLabel lbl_limpiar;
     private javax.swing.JLabel lbl_nombreUsuario;
-    private javax.swing.JLabel lbl_sucursal;
+    private javax.swing.JLabel lbl_sucursal1;
     private javax.swing.JLabel lbl_tituloSucursales;
     private javax.swing.JLabel lbl_usuario;
     private javax.swing.JTextField txt_distancia;

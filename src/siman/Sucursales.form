@@ -80,93 +80,78 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                       <Component id="lbl_usuario" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="lbl_nombreUsuario" min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="214" max="-2" attributes="0"/>
-                              <Component id="lbl_tituloSucursales" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="609" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="lbl_home" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="76" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="btn_asignar" min="-2" pref="478" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="lbl_colaborador" min="-2" pref="32" max="-2" attributes="0"/>
-                                          <Component id="lbl_distancia" alignment="1" min="-2" pref="32" max="-2" attributes="0"/>
-                                          <Component id="lbl_sucursal" min="-2" pref="32" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="txt_distancia" min="-2" pref="434" max="-2" attributes="0"/>
-                                          <Component id="cmb_sucursales" alignment="0" min="-2" pref="434" max="-2" attributes="0"/>
-                                          <Component id="cmb_colaboradores" min="-2" pref="434" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <EmptySpace max="32767" attributes="0"/>
-                          </Group>
+                      <EmptySpace min="-2" pref="234" max="-2" attributes="0"/>
+                      <Component id="lbl_tituloSucursales" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="lbl_home" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="392" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="lbl_colaborador" min="-2" pref="32" max="-2" attributes="0"/>
+                          <Component id="lbl_distancia" alignment="1" min="-2" pref="32" max="-2" attributes="0"/>
+                          <Component id="lbl_sucursal1" min="-2" pref="32" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="txt_distancia" min="-2" pref="434" max="-2" attributes="0"/>
+                          <Component id="cmb_sucursales" alignment="0" min="-2" pref="434" max="-2" attributes="0"/>
+                          <Component id="cmb_colaboradores" min="-2" pref="434" max="-2" attributes="0"/>
+                          <Component id="btn_asignar" min="-2" pref="434" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                      <Component id="lbl_limpiar" min="-2" pref="32" max="-2" attributes="0"/>
+                      <EmptySpace pref="405" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                                      <Component id="lbl_home" alignment="0" min="-2" pref="76" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                                          <Component id="lbl_usuario" min="-2" pref="76" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <Component id="lbl_tituloSucursales" alignment="1" min="-2" pref="49" max="-2" attributes="0"/>
+                                  <Component id="lbl_usuario" alignment="0" min="-2" pref="76" max="-2" attributes="0"/>
+                                  <Component id="lbl_home" min="-2" pref="76" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
-                              <Component id="lbl_nombreUsuario" min="-2" pref="49" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="64" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lbl_tituloSucursales" min="-2" pref="49" max="-2" attributes="0"/>
+                                  <Component id="lbl_nombreUsuario" min="-2" pref="49" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
+                      <EmptySpace min="-2" pref="133" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="cmb_sucursales" min="-2" pref="68" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="cmb_sucursales" min="-2" pref="68" max="-2" attributes="0"/>
+                                  <Component id="lbl_sucursal1" min="-2" pref="68" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="lbl_colaborador" min="-2" pref="68" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
-                                      <Component id="cmb_colaboradores" min="-2" pref="68" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="lbl_colaborador" min="-2" pref="68" max="-2" attributes="0"/>
+                                  <Component id="cmb_colaboradores" min="-2" pref="68" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="lbl_distancia" min="-2" pref="68" max="-2" attributes="0"/>
                                   <Component id="txt_distancia" min="-2" pref="68" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-                              <Component id="btn_asignar" min="-2" pref="76" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="lbl_sucursal" min="-2" pref="68" max="-2" attributes="0"/>
+                          <Component id="lbl_limpiar" min="-2" pref="68" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="205" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+                      <Component id="btn_asignar" min="-2" pref="76" max="-2" attributes="0"/>
+                      <EmptySpace pref="126" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -202,7 +187,7 @@
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Agregar"/>
+                <Property name="text" type="java.lang.String" value="Asignar"/>
                 <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                   <Color id="Hand Cursor"/>
                 </Property>
@@ -244,14 +229,17 @@
                 <Property name="text" type="java.lang.String" value="Sucursales"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="lbl_sucursal">
+            <Component class="javax.swing.JLabel" name="lbl_limpiar">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/Img/ubicacion.png"/>
+                  <Image iconType="3" name="/Img/clean.png"/>
+                </Property>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
                 </Property>
               </Properties>
               <Events>
-                <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lbl_sucursalMousePressed"/>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lbl_limpiarMouseClicked"/>
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lbl_distancia">
@@ -329,6 +317,16 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
+            </Component>
+            <Component class="javax.swing.JLabel" name="lbl_sucursal1">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/Img/ubicacion.png"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lbl_sucursal1MousePressed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
