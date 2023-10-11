@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="Librerias">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/PlaceHolder.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/KGradientPanel.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/AbsoluteLayout.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/itext-pdfa-5.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/jasperreports-6.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/commons-collections-3.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/commons-codec-1.14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/poi-3.10.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/jcalendar-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/junit-4.13-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/mssql-jdbc-9.4.0.jre8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/itextpdf-5.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/commons-digester-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/build/classes/Librerias/flatlaf-1.6.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

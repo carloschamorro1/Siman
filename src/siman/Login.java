@@ -285,9 +285,8 @@ public class Login extends javax.swing.JFrame {
             }
             if(rs.next()){
                 this.dispose();
-                    JOptionPane.showMessageDialog(null, "Bienvenido " + usuario, "Ingrese sus datos", JOptionPane.INFORMATION_MESSAGE);
-                    Principal principal = new Principal(txt_usuario.getText());
-                    principal.setVisible(true);
+                Principal principal = new Principal(txt_usuario.getText());
+                principal.setVisible(true);
             }
             else{
                 Toolkit.getDefaultToolkit().beep();

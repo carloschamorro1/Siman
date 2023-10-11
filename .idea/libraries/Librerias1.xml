@@ -1,0 +1,23 @@
+<component name="libraryTable">
+  <library name="Librerias1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/Librerias/itextpdf-5.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/jcalendar-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/commons-collections-3.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/commons-logging-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/PlaceHolder.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/commons-codec-1.14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/AbsoluteLayout.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/mssql-jdbc-9.4.0.jre8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/itext-pdfa-5.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/commons-digester-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/jasperreports-6.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/poi-3.10.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/junit-4.13-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/flatlaf-1.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/Librerias/KGradientPanel.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
