@@ -1303,13 +1303,11 @@ public class Viajes extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new Viajes().setVisible(true);
-                } catch (SQLException ex) {
-                    Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                new Viajes().setVisible(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }

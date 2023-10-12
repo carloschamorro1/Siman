@@ -46,7 +46,7 @@ public class Sucursales extends javax.swing.JFrame {
         holders();
         llenarSucursales();
         desactivarCampos();
-        lbl_nombreUsuario.setText("nombreUsuario");
+        lbl_nombreUsuario.setText(nombreUsuario);
         this.con = ConexionBD.obtenerConexion();
     }
 
@@ -687,13 +687,11 @@ public class Sucursales extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new Sucursales().setVisible(true);
-                } catch (SQLException ex) {
-                    Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                new Sucursales().setVisible(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
