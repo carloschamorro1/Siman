@@ -45,19 +45,24 @@ import utilidades.Queries;
 public class Viajes extends javax.swing.JFrame {
     ArrayList<String> viajes = new ArrayList<String>();
     int totalPrecioOrden;
-    boolean hayDecimal = false;
+    boolean facturaActiva = false;
     Statement stmt = null;
     Connection con = null;
     int filaSeleccionada;
-    int id_colaboradorQueRegistra;
-    int id_colaboradorRegistrado;
-    int id_sucursal;
+    int idColaboradorQueRegistra;
+    int idColaboradorRegistrado;
+    int idSucursal;
+    int idTransportista;
+    int idViaje;
     double tarifa;
     double distancia;
     double distanciaTotal;
     double total;
     double subtotal;
     double isv;
+    String nombreColaborador;
+    String nombreSucursal;
+    String fecha;
 
     /**
      * Creates new form Viajes
@@ -70,13 +75,8 @@ public class Viajes extends javax.swing.JFrame {
         this.con = ConexionBD.obtenerConexion();
         llenarTransportistas();
         llenarSucursales();
-        /*lbl_nombreProducto.setVisible(false);
-        lbl_idFactura.setVisible(false);
-        lbl_idCliente.setVisible(false);
-        lbl_idProducto.setVisible(false);
-        lbl_idDetalle.setVisible(false);     
-        buscarClientes();
-        clientesArray();*/
+        idColaboradorQueRegistra = capturarIdColaboradorPorNombreUsuario(nombreUsuario);
+        fecha = capturarFechaActual();
     }
 
     public Viajes() throws SQLException {
@@ -86,8 +86,8 @@ public class Viajes extends javax.swing.JFrame {
         llenarTransportistas();
         llenarSucursales();
         this.con = ConexionBD.obtenerConexion();
-        //buscarClientes();
-        //clientesArray();
+        idColaboradorQueRegistra = 1;
+        fecha = capturarFechaActual();
     }
 
     public void informacionGeneral() {
@@ -95,6 +95,14 @@ public class Viajes extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
         PlaceHolder holder;
+    }
+    
+    private String capturarFechaActual(){
+        Calendar f;
+        f = Calendar.getInstance();
+        int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
+        String fecha = (año + "-" + mes + "-" + d);
+        return fecha;
     }
     
     private void holders() {
@@ -128,38 +136,81 @@ public class Viajes extends javax.swing.JFrame {
         restablecerComboBoxes();
     }
     
-
-    private void actualizarDatos() {
-        /*try {
-            String nombreProducto = lbl_nombreProducto.getText();
-            String sql = "SELECT * FROM inventario where nombreproducto = '" + nombreProducto + "'";
-            stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            double subtotal = 0;
-            while (rs.next()) {
-                Locale locale = new Locale("es", "HN");
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(locale);
-                DefaultTableModel model = (DefaultTableModel) tbl_orden.getModel();
-                String[] datos = new String[3];
-                datos[0] = rs.getString("nombreproducto");
-                datos[1] = "1";
-                String precio = currencyFormatter.format(rs.getDouble("precio")).substring(1);
-                datos[2] = precio;       
-                model.addRow(datos);
-                subtotal = rs.getDouble("precio");
-                //lbl_idProducto.setText(rs.getString("idproducto"));
-                guardarDetalle();
-                int indiceUltimaFila = tbl_orden.getRowCount() - 1;
-                model.removeRow(indiceUltimaFila);
-                String[] datos2 = new String[4];
-                datos2[0] = rs.getString("nombreproducto");
-                datos2[1] = "1";              
-                datos2[2] = precio;
-                datos2[3] = lbl_idDetalle.getText();
-                model.addRow(datos2);
-                
+    public int capturarIdColaborador(String numeroIdentidad){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '"+numeroIdentidad+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_colaborador"));
+                return id;
             }
-            double totalAnterior = Double.parseDouble(txt_total.getText());
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
+    }
+    
+    public int capturarIdColaboradorPorNombreUsuario(String nombreUsuario){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_colaborador from usuarios where nombre_usuario = '"+nombreUsuario+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_colaborador"));
+                return id;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
+    }
+    
+    public String capturarNombreColaborador(int id_colaborador){
+        try {
+            Statement st = con.createStatement();
+            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '"+id_colaborador+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                nombreColaborador = rs.getString("nombre_colaborador") + " " + rs.getString("apellido_colaborador");
+                return nombreColaborador;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return "";
+    }
+    
+    private String capturarNombreSucursal(int id_sucursal){
+        try {
+            Statement st = con.createStatement();
+            String sql = "select nombre_sucursal from sucursales where id_sucursal = '"+id_sucursal+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                nombreSucursal = rs.getString("nombre_sucursal");
+                return nombreSucursal;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return "";
+    }
+    
+
+    private void actualizarTabla() {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
+                String[] datos = new String[5];
+                datos[0] = "Transportista";
+                datos[1] = "Sucursal";
+                datos[2] = "colaborador";
+                datos[3] = "no. identidad";
+                datos[4] = "distancia";
+                model.addRow(datos);
+                
+            /*double totalAnterior = Double.parseDouble(txt_total.getText());
             double totalNuevo = totalAnterior + subtotal;
 
             double isv = totalNuevo * 0.15;
@@ -172,10 +223,10 @@ public class Viajes extends javax.swing.JFrame {
             String totalFinal = String.valueOf(total);
             txt_subtotal.setText(subtotalFinal);
             txt_isv.setText(isvFinal);
-            txt_total.setText(totalFinal);
+            txt_total.setText(totalFinal);*/
         } catch (Exception e) {
             System.err.println(e);
-        }*/
+        }
     }
     
     public void restablecerComboBoxes(){
@@ -185,19 +236,22 @@ public class Viajes extends javax.swing.JFrame {
 
     
     public void accionesIniciar(){
-        btn_iniciarViaje.setEnabled(false);
+        lbl_iniciar.setEnabled(false);
         btn_cancelarViaje.setEnabled(true);
-        btn_finalizarViaje.setEnabled(true);
+        btn_guardarViaje.setEnabled(true);
         tbl_viajes.setEnabled(true);
-        lbl_transportistas.setEnabled(true);
-        cmb_transportistas.setEnabled(true);
+        lbl_sucursales.setEnabled(true);
+        cmb_sucursales.setEnabled(true);
+        facturaActiva = true;
     }
     
     public void botonesPorDefecto(){
-        btn_iniciarViaje.setEnabled(true);
+        lbl_iniciar.setEnabled(true);
+        btn_limpiar.setEnabled(false);
         btn_cancelarViaje.setEnabled(false);
         btn_eliminarViaje.setEnabled(false);
-        btn_finalizarViaje.setEnabled(false);
+        btn_guardarViaje.setEnabled(false);
+        btn_agregarColaborador.setEnabled(false);
     }
     
     public void deleteAllRows(final DefaultTableModel model) {
@@ -210,15 +264,14 @@ public class Viajes extends javax.swing.JFrame {
         txt_subtotal.setText("0");
         txt_isv.setText("0");
         txt_total.setText("0");
-        txt_distanciaTotal.setText("");
-        /*cmb_metodoPago.setSelectedItem("Seleccione el método");
-        cmb_metodoPago.setEnabled(false);
-        txt_cambio.setText("");
-        cmb_cliente.setEnabled(true);
-        cmb_cliente.setSelectedItem("1. Consumidor Final");
-        habilitarNumeros(false);
-        habilitarProductos(false);*/
-        botonesPorDefecto();  
+        txt_distanciaTotal.setText("0");
+        botonesPorDefecto();
+        cmb_transportistas.setEnabled(true);
+        cmb_colaboradores.setEnabled(false);
+        cmb_sucursales.setEnabled(false);
+        cmb_transportistas.setSelectedItem("Seleccione al transportista");
+        cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
+        cmb_sucursales.setSelectedItem("Seleccione la sucursal");
         DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
         deleteAllRows(model);
     }
@@ -239,20 +292,33 @@ public class Viajes extends javax.swing.JFrame {
        return -1;
     }
     
-    public int capturarIdColaborador(String numeroIdentidad){
+    private int capturarIdTransportista(String numeroIdentidad){
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '"+numeroIdentidad+"'";
+            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '"+numeroIdentidad+"'";
             ResultSet rs = st.executeQuery(sql);
             if(rs.next()){
-                id = Integer.parseInt(rs.getString("id_colaborador"));
+                id = Integer.parseInt(rs.getString("id_transportista"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
+    }
+    
+    public void capturarIdViaje() {
+        try {
+            Statement st = con.createStatement();
+            String sql = "Select top 1 id_viaje_encabezado from viajes_encabezado order by id_viaje_encabezado desc";
+            ResultSet rs = st.executeQuery(sql);
+            if (rs.next()) {
+                idViaje = rs.getInt("id_viaje_encabezado");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public double llenarTarifa(String numeroIdentidadTransportista){
@@ -440,15 +506,16 @@ public class Viajes extends javax.swing.JFrame {
         lbl_usuario = new javax.swing.JLabel();
         lbl_tituloViajes = new javax.swing.JLabel();
         jpn_productos = new javax.swing.JPanel();
-        lbl_sucursal = new javax.swing.JLabel();
+        lbl_sucursales = new javax.swing.JLabel();
         cmb_sucursales = new javax.swing.JComboBox<>();
-        lbl_colaborador = new javax.swing.JLabel();
+        lbl_colaboradores = new javax.swing.JLabel();
         cmb_colaboradores = new javax.swing.JComboBox<>();
         lbl_distancia = new javax.swing.JLabel();
         txt_distancia = new javax.swing.JTextField();
-        btn_agregarViaje = new javax.swing.JButton();
+        btn_agregarColaborador = new javax.swing.JButton();
         lbl_transportistas = new javax.swing.JLabel();
         cmb_transportistas = new javax.swing.JComboBox<>();
+        lbl_iniciar = new javax.swing.JLabel();
         jsp_tabla = new javax.swing.JScrollPane();
         tbl_viajes = new javax.swing.JTable();
         jpn_acciones = new javax.swing.JPanel();
@@ -465,8 +532,8 @@ public class Viajes extends javax.swing.JFrame {
         txt_distanciaTotal = new javax.swing.JTextField();
         txt_tarifa = new javax.swing.JTextField();
         btn_cancelarViaje = new javax.swing.JButton();
-        btn_iniciarViaje = new javax.swing.JButton();
-        btn_finalizarViaje = new javax.swing.JButton();
+        btn_limpiar = new javax.swing.JButton();
+        btn_guardarViaje = new javax.swing.JButton();
         btn_eliminarViaje = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -498,11 +565,11 @@ public class Viajes extends javax.swing.JFrame {
 
         jpn_productos.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
-        lbl_sucursal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/ubicacion.png"))); // NOI18N
-        lbl_sucursal.setEnabled(false);
-        lbl_sucursal.addMouseListener(new java.awt.event.MouseAdapter() {
+        lbl_sucursales.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/ubicacion.png"))); // NOI18N
+        lbl_sucursales.setEnabled(false);
+        lbl_sucursales.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                lbl_sucursalMousePressed(evt);
+                lbl_sucursalesMousePressed(evt);
             }
         });
 
@@ -517,11 +584,11 @@ public class Viajes extends javax.swing.JFrame {
             }
         });
 
-        lbl_colaborador.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/name.png"))); // NOI18N
-        lbl_colaborador.setEnabled(false);
-        lbl_colaborador.addMouseListener(new java.awt.event.MouseAdapter() {
+        lbl_colaboradores.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/name.png"))); // NOI18N
+        lbl_colaboradores.setEnabled(false);
+        lbl_colaboradores.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                lbl_colaboradorMousePressed(evt);
+                lbl_colaboradoresMousePressed(evt);
             }
         });
 
@@ -557,31 +624,30 @@ public class Viajes extends javax.swing.JFrame {
             }
         });
 
-        btn_agregarViaje.setBackground(new java.awt.Color(205, 63, 145));
-        btn_agregarViaje.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
-        btn_agregarViaje.setForeground(new java.awt.Color(255, 255, 255));
-        btn_agregarViaje.setText("Agregar Viaje");
-        btn_agregarViaje.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_agregarViaje.setEnabled(false);
-        btn_agregarViaje.addMouseListener(new java.awt.event.MouseAdapter() {
+        btn_agregarColaborador.setBackground(new java.awt.Color(205, 63, 145));
+        btn_agregarColaborador.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
+        btn_agregarColaborador.setForeground(new java.awt.Color(255, 255, 255));
+        btn_agregarColaborador.setText("Agregar Colaborador");
+        btn_agregarColaborador.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_agregarColaborador.setEnabled(false);
+        btn_agregarColaborador.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn_agregarViajeMouseEntered(evt);
+                btn_agregarColaboradorMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn_agregarViajeMouseExited(evt);
+                btn_agregarColaboradorMouseExited(evt);
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                btn_agregarViajeMousePressed(evt);
+                btn_agregarColaboradorMousePressed(evt);
             }
         });
-        btn_agregarViaje.addActionListener(new java.awt.event.ActionListener() {
+        btn_agregarColaborador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_agregarViajeActionPerformed(evt);
+                btn_agregarColaboradorActionPerformed(evt);
             }
         });
 
         lbl_transportistas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/bus.png"))); // NOI18N
-        lbl_transportistas.setEnabled(false);
         lbl_transportistas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 lbl_transportistasMousePressed(evt);
@@ -592,10 +658,17 @@ public class Viajes extends javax.swing.JFrame {
         cmb_transportistas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione al transportista" }));
         cmb_transportistas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         cmb_transportistas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        cmb_transportistas.setEnabled(false);
         cmb_transportistas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmb_transportistasActionPerformed(evt);
+            }
+        });
+
+        lbl_iniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/inicio.png"))); // NOI18N
+        lbl_iniciar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lbl_iniciar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lbl_iniciarMouseClicked(evt);
             }
         });
 
@@ -604,7 +677,7 @@ public class Viajes extends javax.swing.JFrame {
         jpn_productosLayout.setHorizontalGroup(
             jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpn_productosLayout.createSequentialGroup()
-                .addGap(41, 41, 41)
+                .addContainerGap()
                 .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpn_productosLayout.createSequentialGroup()
                         .addComponent(lbl_transportistas, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -612,8 +685,8 @@ public class Viajes extends javax.swing.JFrame {
                         .addComponent(cmb_transportistas, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jpn_productosLayout.createSequentialGroup()
                         .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_sucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lbl_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -622,32 +695,36 @@ public class Viajes extends javax.swing.JFrame {
                         .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btn_agregarViaje, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txt_distancia, javax.swing.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE))))
-                .addContainerGap(57, Short.MAX_VALUE))
+                            .addComponent(btn_agregarColaborador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbl_iniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jpn_productosLayout.setVerticalGroup(
             jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpn_productosLayout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lbl_transportistas, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmb_transportistas, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpn_productosLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(lbl_transportistas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cmb_transportistas, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_iniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_sucursal, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmb_colaboradores, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jpn_productosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(28, 28, 28)
-                .addComponent(btn_agregarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addComponent(btn_agregarColaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36))
         );
 
         tbl_viajes.setModel(new javax.swing.table.DefaultTableModel(
@@ -655,7 +732,7 @@ public class Viajes extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Nombre del Producto", "Cantidad", "Precio", "ID"
+                "id", "Transportista", "Sucursal", "Colaborador", "No. Identidad", "Distancia"
             }
         ));
         tbl_viajes.setEnabled(false);
@@ -796,42 +873,43 @@ public class Viajes extends javax.swing.JFrame {
             }
         });
 
-        btn_iniciarViaje.setBackground(new java.awt.Color(205, 63, 145));
-        btn_iniciarViaje.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
-        btn_iniciarViaje.setForeground(new java.awt.Color(255, 255, 255));
-        btn_iniciarViaje.setText("Iniciar");
-        btn_iniciarViaje.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_iniciarViaje.addMouseListener(new java.awt.event.MouseAdapter() {
+        btn_limpiar.setBackground(new java.awt.Color(205, 63, 145));
+        btn_limpiar.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
+        btn_limpiar.setForeground(new java.awt.Color(255, 255, 255));
+        btn_limpiar.setText("Limpiar");
+        btn_limpiar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_limpiar.setEnabled(false);
+        btn_limpiar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn_iniciarViajeMouseEntered(evt);
+                btn_limpiarMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn_iniciarViajeMouseExited(evt);
+                btn_limpiarMouseExited(evt);
             }
         });
-        btn_iniciarViaje.addActionListener(new java.awt.event.ActionListener() {
+        btn_limpiar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_iniciarViajeActionPerformed(evt);
+                btn_limpiarActionPerformed(evt);
             }
         });
 
-        btn_finalizarViaje.setBackground(new java.awt.Color(205, 63, 145));
-        btn_finalizarViaje.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
-        btn_finalizarViaje.setForeground(new java.awt.Color(255, 255, 255));
-        btn_finalizarViaje.setText("Finalizar");
-        btn_finalizarViaje.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_finalizarViaje.setEnabled(false);
-        btn_finalizarViaje.addMouseListener(new java.awt.event.MouseAdapter() {
+        btn_guardarViaje.setBackground(new java.awt.Color(205, 63, 145));
+        btn_guardarViaje.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
+        btn_guardarViaje.setForeground(new java.awt.Color(255, 255, 255));
+        btn_guardarViaje.setText("Guardar");
+        btn_guardarViaje.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_guardarViaje.setEnabled(false);
+        btn_guardarViaje.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn_finalizarViajeMouseEntered(evt);
+                btn_guardarViajeMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn_finalizarViajeMouseExited(evt);
+                btn_guardarViajeMouseExited(evt);
             }
         });
-        btn_finalizarViaje.addActionListener(new java.awt.event.ActionListener() {
+        btn_guardarViaje.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_finalizarViajeActionPerformed(evt);
+                btn_guardarViajeActionPerformed(evt);
             }
         });
 
@@ -866,8 +944,8 @@ public class Viajes extends javax.swing.JFrame {
                 .addComponent(jpn_tarifa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jpn_accionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_finalizarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_iniciarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btn_guardarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpn_accionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btn_eliminarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -879,11 +957,11 @@ public class Viajes extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpn_accionesLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jpn_accionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_iniciarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_cancelarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jpn_accionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_finalizarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_guardarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_eliminarViaje, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(19, 19, 19))
             .addGroup(jpn_accionesLayout.createSequentialGroup()
@@ -913,12 +991,12 @@ public class Viajes extends javax.swing.JFrame {
                         .addGroup(jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jpn_acciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpn_principalLayout.createSequentialGroup()
-                                .addGroup(jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jpn_principalLayout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(lbl_tituloViajes))
-                                    .addComponent(jsp_tabla))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(lbl_tituloViajes)
+                                .addGap(576, 576, 576))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpn_principalLayout.createSequentialGroup()
+                                .addComponent(jsp_tabla)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jpn_productos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addGap(21, 21, 21))
         );
@@ -983,71 +1061,58 @@ public class Viajes extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-        Principal principal = new Principal(lbl_nombreUsuario.getText());
-        this.dispose();
-        principal.setVisible(true);
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lbl_homeMousePressed
-
-    private void btn_iniciarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_iniciarViajeMouseEntered
-        btn_iniciarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_iniciarViajeMouseEntered
-
-    private void btn_iniciarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_iniciarViajeMouseExited
-        btn_iniciarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_iniciarViajeMouseExited
-
-    private void btn_iniciarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_iniciarViajeActionPerformed
-        btn_iniciarViaje.setBackground(new Color(40, 74, 172));
-        accionesIniciar();
-        /*try {
-            Calendar f;
-            f = Calendar.getInstance();
-            int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
-            String fecha = (año + "-" + mes + "-" + d);
+    private void btn_eliminarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarViajeActionPerformed
+        btn_eliminarViaje.setBackground(new Color(40, 74, 172));
+        try {
             PreparedStatement ps;
             ResultSet rs;
-            String cai = "35BD6A-0195F4-B34BAA-8B7D13-37791A-2D";
-            int totalInicial = 0;
-            int cambioInicial = 0;
-            int pagoInicial = 0;
-            ps = con.prepareStatement("INSERT INTO factura_encabezado (cai, idempleado, totalfactura, idcliente,"
-                    + "fecha_factura,cambio_factura,pago_factura)"
-                    + "VALUES(?,?,?,?,?,?,?)");
-            ps.setString(1, cai);
-            String idEmpleado = capturarIdEmpleado();
-            //String idCliente = lbl_idCliente.getText();
-            ps.setString(2, idEmpleado);
-            ps.setString(3, String.valueOf(totalInicial));
-            //ps.setString(4, idCliente);
-            ps.setString(5, fecha);
-            ps.setString(6, String.valueOf(cambioInicial));
-            ps.setString(7, String.valueOf(pagoInicial));
+            ps = con.prepareStatement("Delete factura_detalle\n"
+                + "where iddetalle =?");
+            String idDetalle = tbl_viajes.getValueAt(filaSeleccionada, 3).toString();
+            ps.setString(1, idDetalle);
             int res = ps.executeUpdate();
             if (res > 0) {
-                capturarIdFactura();
-                accionesIniciar();
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }*/
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_iniciarViajeActionPerformed
+                JOptionPane.showMessageDialog(this, "Producto eliminado");
+                DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
+                model.removeRow(filaSeleccionada);
+                int totalFilas = tbl_viajes.getRowCount();
+                totalPrecioOrden = 0;
+                for (int i = 0; i < totalFilas; i++) {
+                    totalPrecioOrden += Double.parseDouble(tbl_viajes.getValueAt(i, 2).toString());
+                }
 
-    private void btn_finalizarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_finalizarViajeActionPerformed
-        btn_finalizarViaje.setBackground(new Color(40, 74, 172));
+                actualizarTotal();
+                btn_eliminarViaje.setEnabled(false);
+            }
+
+        } catch (Exception e) {
+
+        }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_eliminarViajeActionPerformed
+
+    private void btn_eliminarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseExited
+        btn_eliminarViaje.setBackground(new Color(205, 63, 145));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_eliminarViajeMouseExited
+
+    private void btn_eliminarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseEntered
+        btn_eliminarViaje.setBackground(new Color(156, 2, 91));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_eliminarViajeMouseEntered
+
+    private void btn_guardarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarViajeActionPerformed
+        btn_guardarViaje.setBackground(new Color(40, 74, 172));
         try{
-           validacionPago(); 
-           PreparedStatement ps;
+            validacionPago();
+            PreparedStatement ps;
             ResultSet rs;
             ps = con.prepareStatement("Update factura_encabezado\n" +
-                                      "set totalfactura = ?,\n" +
-                                      "cambio_factura = ?, \n" +
-                                      "pago_factura =? "+
-                                      "where idfactura = ?");
+                "set totalfactura = ?,\n" +
+                "cambio_factura = ?, \n" +
+                "pago_factura =? "+
+                "where idfactura = ?");
             ps.setString(1, txt_total.getText());
             //String cambio = txt_cambio.getText().substring(1);
             //ps.setString(2, cambio);
@@ -1060,95 +1125,74 @@ public class Viajes extends javax.swing.JFrame {
                 accionesCancelar();
             }
         }catch(Exception e){
-            
+
         }
-        
+
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_finalizarViajeActionPerformed
+    }//GEN-LAST:event_btn_guardarViajeActionPerformed
+
+    private void btn_guardarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_guardarViajeMouseExited
+        btn_guardarViaje.setBackground(new Color(205, 63, 145));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_guardarViajeMouseExited
+
+    private void btn_guardarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_guardarViajeMouseEntered
+        btn_guardarViaje.setBackground(new Color(156, 2, 91));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_guardarViajeMouseEntered
+
+    private void btn_limpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_limpiarActionPerformed
+        btn_limpiar.setBackground(new Color(40, 74, 172));
+        restablecer();
+        cmb_transportistas.setEnabled(true);
+        cmb_transportistas.setSelectedItem("Seleccione al transportista");
+        btn_agregarColaborador.setEnabled(false);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_limpiarActionPerformed
+
+    private void btn_limpiarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_limpiarMouseExited
+        btn_limpiar.setBackground(new Color(205, 63, 145));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_limpiarMouseExited
+
+    private void btn_limpiarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_limpiarMouseEntered
+        btn_limpiar.setBackground(new Color(156, 2, 91));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_limpiarMouseEntered
 
     private void btn_cancelarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarViajeActionPerformed
         btn_cancelarViaje.setBackground(new Color(40, 74, 172));
+        facturaActiva = false;
         try {
                 PreparedStatement ps;
-                ps = con.prepareStatement("Delete factura_detalle\n"
-                        + "where idfactura =?");   
-                //ps.setString(1, lbl_idFactura.getText());
+                ps = con.prepareStatement("Delete viajes_detalle "
+                        + "where id_viaje_encabezado =?");   
+                ps.setInt(1, idViaje);
                 
                 PreparedStatement ps2;
-                ps2 = con.prepareStatement("Delete factura_encabezado\n"
-                        + "where idfactura =?");   
-                //ps2.setString(1, lbl_idFactura.getText());
+                ps2 = con.prepareStatement("Delete viajes_encabezado "
+                        + "where id_viaje_encabezado =?");   
+                ps2.setInt(1, idViaje);
                 
-                JOptionPane.showMessageDialog(this, "Factura cancelada");
+                JOptionPane.showMessageDialog(this, "Viaje cancelado");
                 accionesCancelar();  
 
-            } catch (Exception e) {
-
+            }catch (Exception e) {
+                
             }
-       
+
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_cancelarViajeActionPerformed
-
-    private void btn_finalizarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_finalizarViajeMouseEntered
-        btn_finalizarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_finalizarViajeMouseEntered
-
-    private void btn_finalizarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_finalizarViajeMouseExited
-        btn_finalizarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_finalizarViajeMouseExited
-
-    private void btn_cancelarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancelarViajeMouseEntered
-        btn_cancelarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_cancelarViajeMouseEntered
 
     private void btn_cancelarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancelarViajeMouseExited
         btn_cancelarViaje.setBackground(new Color(205, 63, 145));
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_cancelarViajeMouseExited
 
-    private void btn_eliminarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseEntered
-        btn_eliminarViaje.setBackground(new Color(156, 2, 91));
+    private void btn_cancelarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancelarViajeMouseEntered
+        btn_cancelarViaje.setBackground(new Color(156, 2, 91));
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_eliminarViajeMouseEntered
-
-    private void btn_eliminarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseExited
-        btn_eliminarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_eliminarViajeMouseExited
-
-    private void btn_eliminarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarViajeActionPerformed
-        btn_eliminarViaje.setBackground(new Color(40, 74, 172));
-            try {
-                PreparedStatement ps;
-                ResultSet rs;
-                ps = con.prepareStatement("Delete factura_detalle\n"
-                        + "where iddetalle =?");   
-                String idDetalle = tbl_viajes.getValueAt(filaSeleccionada, 3).toString();
-                ps.setString(1, idDetalle);
-                int res = ps.executeUpdate();
-                if (res > 0) {
-                    JOptionPane.showMessageDialog(this, "Producto eliminado");
-                    DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
-                    model.removeRow(filaSeleccionada);
-                    int totalFilas = tbl_viajes.getRowCount();
-                    totalPrecioOrden = 0;
-                    for (int i = 0; i < totalFilas; i++) {
-                        totalPrecioOrden += Double.parseDouble(tbl_viajes.getValueAt(i, 2).toString()); 
-                    }
-                    
-                    actualizarTotal();
-                    btn_eliminarViaje.setEnabled(false);
-                }
-
-            } catch (Exception e) {
-
-            }
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_eliminarViajeActionPerformed
+    }//GEN-LAST:event_btn_cancelarViajeMouseEntered
 
     private void tbl_viajesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_viajesMouseClicked
         btn_eliminarViaje.setEnabled(true);
@@ -1156,71 +1200,74 @@ public class Viajes extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tbl_viajesMouseClicked
 
-    private void lbl_sucursalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_sucursalMousePressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lbl_sucursalMousePressed
-
-    private void cmb_sucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_sucursalesActionPerformed
-        if(cmb_sucursales.getItemCount() ==0){
-            return;
+    private void lbl_iniciarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_iniciarMouseClicked
+        if(!lbl_iniciar.isEnabled()){
+            return;     
         }
+            try {
+                PreparedStatement ps;
+                ResultSet rs;
+                double totalInicial = 0;
+                ps = con.prepareStatement("INSERT INTO viajes_encabezado (id_colaborador, id_transportista, fecha_viaje, total_viaje) " +
+                                          "VALUES(?,?,?,?)");
+                ps.setInt(1, idColaboradorQueRegistra);
+                ps.setInt(2, idTransportista);
+                ps.setString(3, fecha);
+                ps.setDouble(4, totalInicial);
+                int res = ps.executeUpdate();
+                if (res > 0) {
+                    capturarIdViaje();
+                    accionesIniciar();
+                    JOptionPane.showMessageDialog(rootPane, idViaje);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage());
+            }    
         
-        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){
-            limpiarColaboradores();
-            String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
-            String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
-            String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
-            String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
-            String nombreSucursal = partesInformacionSucursal[0].trim();
-            llenarColaboradoresPorSucursal(nombreSucursal);
-            cmb_colaboradores.setEnabled(true);
-            id_sucursal = capturarIdSucursal(nombreSucursal);
-        }
-    }//GEN-LAST:event_cmb_sucursalesActionPerformed
+    }//GEN-LAST:event_lbl_iniciarMouseClicked
 
-    private void lbl_colaboradorMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_colaboradorMousePressed
-        cmb_colaboradores.requestFocus();
-    }//GEN-LAST:event_lbl_colaboradorMousePressed
+    private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
 
-    private void cmb_colaboradoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_colaboradoresActionPerformed
-        if(cmb_colaboradores.getItemCount() ==0){
-            return;
-        }
-        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){
-            String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
-            String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
-            String numeroIdentidad = partesInformacionSucursal[2].trim();
-            id_colaboradorRegistrado = capturarIdColaborador(numeroIdentidad);
-            distancia = llenarDistancia(id_colaboradorRegistrado,id_sucursal);
-            txt_distancia.setText(Double.toString(distancia));
-            
+        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
+            limpiarSucursales();
+            llenarSucursales();
             String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
             String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
             String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
-            String [] partesInformacionTransportista = informacionTransportistaFormateada.split("\\|");
-            String numeroIdentidadTransportista = partesInformacionTransportista[1].trim();
-            tarifa = llenarTarifa(numeroIdentidadTransportista);
-            txt_tarifa.setText(Double.toString(tarifa));
-            total = distancia * tarifa;
-            String totalFormateado = String.format("%.2f", total);
-            txt_total.setText(totalFormateado);
+            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
+            String numeroIdentidadTransportista = partesInformacionTransportistas[1].trim();
+            idTransportista = capturarIdTransportista(numeroIdentidadTransportista);
+            cmb_transportistas.setEnabled(false);
+            btn_limpiar.setEnabled(true);
+            lbl_iniciar.setEnabled(true);
         }
-        else{
-            txt_distanciaTotal.setEnabled(false);
-        }
-    }//GEN-LAST:event_cmb_colaboradoresActionPerformed
+    }//GEN-LAST:event_cmb_transportistasActionPerformed
 
     private void lbl_transportistasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_transportistasMousePressed
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_transportistasMousePressed
 
-    private void lbl_distanciaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_distanciaMousePressed
-        txt_distancia.requestFocus();
-    }//GEN-LAST:event_lbl_distanciaMousePressed
-
-    private void txt_distanciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_distanciaActionPerformed
+    private void btn_agregarColaboradorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_agregarColaboradorActionPerformed
+        actualizarTabla();
+        tbl_viajes.setEnabled(true);
+        txt_distancia.setText("Distancia");
+        cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
+        cmb_colaboradores.setEnabled(false);
+        cmb_sucursales.setSelectedItem("Seleccione la sucursal");
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_distanciaActionPerformed
+    }//GEN-LAST:event_btn_agregarColaboradorActionPerformed
+
+    private void btn_agregarColaboradorMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarColaboradorMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_agregarColaboradorMousePressed
+
+    private void btn_agregarColaboradorMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarColaboradorMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_agregarColaboradorMouseExited
+
+    private void btn_agregarColaboradorMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarColaboradorMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_agregarColaboradorMouseEntered
 
     private void txt_distanciaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_distanciaKeyTyped
         char a=evt.getKeyChar();
@@ -1258,32 +1305,86 @@ public class Viajes extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_distanciaKeyTyped
 
-    private void btn_agregarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarViajeMouseEntered
+    private void txt_distanciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_distanciaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_agregarViajeMouseEntered
+    }//GEN-LAST:event_txt_distanciaActionPerformed
 
-    private void btn_agregarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarViajeMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_agregarViajeMouseExited
+    private void lbl_distanciaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_distanciaMousePressed
+        txt_distancia.requestFocus();
+    }//GEN-LAST:event_lbl_distanciaMousePressed
 
-    private void btn_agregarViajeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_agregarViajeMousePressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_agregarViajeMousePressed
-
-    private void btn_agregarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_agregarViajeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_agregarViajeActionPerformed
-
-    private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
-       
-        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
-            limpiarSucursales();
-            llenarSucursales();
-            cmb_sucursales.setEnabled(true);
-        }else{
-           restablecer();
+    private void cmb_colaboradoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_colaboradoresActionPerformed
+        if(cmb_colaboradores.getItemCount() ==0){
+            return;
         }
-    }//GEN-LAST:event_cmb_transportistasActionPerformed
+        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){
+            String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
+            String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
+            String numeroIdentidad = partesInformacionSucursal[2].trim();
+            idColaboradorRegistrado = capturarIdColaborador(numeroIdentidad);
+            distancia = llenarDistancia(idColaboradorRegistrado,idSucursal);
+            txt_distancia.setText(Double.toString(distancia)); 
+
+            String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
+            String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
+            String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
+            String [] partesInformacionTransportista = informacionTransportistaFormateada.split("\\|");
+            String numeroIdentidadTransportista = partesInformacionTransportista[1].trim();
+            tarifa = llenarTarifa(numeroIdentidadTransportista);
+            txt_tarifa.setText(Double.toString(tarifa));
+            total = distancia * tarifa;
+            String totalFormateado = String.format("%.2f", total);
+            txt_total.setText(totalFormateado);
+            btn_agregarColaborador.setEnabled(true);
+        }
+        else{
+            txt_distanciaTotal.setEnabled(false);
+        }
+    }//GEN-LAST:event_cmb_colaboradoresActionPerformed
+
+    private void lbl_colaboradoresMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_colaboradoresMousePressed
+        cmb_colaboradores.requestFocus();
+    }//GEN-LAST:event_lbl_colaboradoresMousePressed
+
+    private void cmb_sucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_sucursalesActionPerformed
+        if(cmb_sucursales.getItemCount() ==0){
+            return;
+        }
+
+        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){
+            txt_distancia.setText("Distancia");
+            txt_total.setText("0");
+            limpiarColaboradores();
+            String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
+            String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
+            String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
+            String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
+            String nombreSucursal = partesInformacionSucursal[0].trim();
+            llenarColaboradoresPorSucursal(nombreSucursal);
+            cmb_colaboradores.setEnabled(true);
+            idSucursal = capturarIdSucursal(nombreSucursal);
+        }else{
+            cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
+            cmb_colaboradores.setEnabled(false);
+            txt_distancia.setText("Distancia");
+            txt_total.setText("0");
+        }
+    }//GEN-LAST:event_cmb_sucursalesActionPerformed
+
+    private void lbl_sucursalesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_sucursalesMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbl_sucursalesMousePressed
+
+    private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
+        if(facturaActiva){
+            JOptionPane.showMessageDialog(null, "No puede regresar mientras un viaje activo, si desea salir, presione cancelar.","Viaje activo",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        Principal principal = new Principal(lbl_nombreUsuario.getText());
+        this.dispose();
+        principal.setVisible(true);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbl_homeMousePressed
 
     /**
      * @param args the command line arguments
@@ -1313,11 +1414,11 @@ public class Viajes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_agregarViaje;
+    private javax.swing.JButton btn_agregarColaborador;
     private javax.swing.JButton btn_cancelarViaje;
     private javax.swing.JButton btn_eliminarViaje;
-    private javax.swing.JButton btn_finalizarViaje;
-    private javax.swing.JButton btn_iniciarViaje;
+    private javax.swing.JButton btn_guardarViaje;
+    private javax.swing.JButton btn_limpiar;
     private javax.swing.JComboBox<String> cmb_colaboradores;
     private javax.swing.JComboBox<String> cmb_sucursales;
     private javax.swing.JComboBox<String> cmb_transportistas;
@@ -1328,14 +1429,15 @@ public class Viajes extends javax.swing.JFrame {
     private javax.swing.JPanel jpn_total;
     private javax.swing.JScrollPane jsp_tabla;
     private keeptoo.KGradientPanel kGradientPanel1;
-    private javax.swing.JLabel lbl_colaborador;
+    private javax.swing.JLabel lbl_colaboradores;
     private javax.swing.JLabel lbl_distancia;
     private javax.swing.JLabel lbl_distanciaTotal;
     private javax.swing.JLabel lbl_home;
+    private javax.swing.JLabel lbl_iniciar;
     private javax.swing.JLabel lbl_isv;
     private javax.swing.JLabel lbl_nombreUsuario;
     private javax.swing.JLabel lbl_subtotal;
-    private javax.swing.JLabel lbl_sucursal;
+    private javax.swing.JLabel lbl_sucursales;
     private javax.swing.JLabel lbl_tarifa;
     private javax.swing.JLabel lbl_tituloViajes;
     private javax.swing.JLabel lbl_total;
