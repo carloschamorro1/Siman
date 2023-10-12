@@ -274,18 +274,15 @@ public class Principal extends javax.swing.JFrame {
 
     private void btn_viajesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_viajesMousePressed
         btn_viajes.setBackground(new Color(40,74,172));
-        /*Clientes cliente;
+        Viajes viaje;
         try {
-            cliente = new Clientes(lbl_nombreUsuario.getText());
+            viaje = new Viajes(lbl_nombreUsuario.getText());
             this.dispose();
-            cliente.setVisible(true);
+            viaje.setVisible(true);
         } catch (SQLException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-       
-        // TODO add your handling code here:
-       
-        // TODO add your handling code here:
+        }
+    
     }//GEN-LAST:event_btn_viajesMousePressed
 
     private void lbl_cerrarSesionMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_cerrarSesionMousePressed

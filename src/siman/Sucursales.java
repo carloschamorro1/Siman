@@ -46,9 +46,8 @@ public class Sucursales extends javax.swing.JFrame {
         holders();
         llenarSucursales();
         desactivarCampos();
-        lbl_nombreUsuario.setText(nombreUsuario);
+        lbl_nombreUsuario.setText("nombreUsuario");
         this.con = ConexionBD.obtenerConexion();
-        //((JSpinner.DefaultEditor) spi_cantidadProducto.getEditor()).getTextField().setEditable(false);
     }
 
     public Sucursales() throws SQLException {
@@ -57,7 +56,6 @@ public class Sucursales extends javax.swing.JFrame {
         holders();
         llenarSucursales();
         desactivarCampos();
-        lbl_nombreUsuario.setText("nombreUsuario");
         this.con = ConexionBD.obtenerConexion();
     }
     
@@ -104,9 +102,9 @@ public class Sucursales extends javax.swing.JFrame {
     
     private void limpiarColaboradores(){
         cmb_colaboradores.removeAllItems();
-        cmb_colaboradores.addItem("Seleccione al colaborador");
+        cmb_colaboradores.addItem("Seleccione al transportista");
     }
-    
+     
     public int capturarIdColaborador(String numeroIdentidad){
         int id;
         try {
@@ -138,7 +136,7 @@ public class Sucursales extends javax.swing.JFrame {
        return "";
     }
     
-    public String capturarNombreSucursal(int id_sucursal){
+    private String capturarNombreSucursal(int id_sucursal){
         try {
             Statement st = con.createStatement();
             String sql = "select nombre_sucursal from sucursales where id_sucursal = '"+id_sucursal+"'";
@@ -153,7 +151,7 @@ public class Sucursales extends javax.swing.JFrame {
        return "";
     }
     
-    public int capturarIdSucursal(String nombreSucursal){
+    private int capturarIdSucursal(String nombreSucursal){
         int id;
         try {
             Statement st = con.createStatement();
@@ -632,7 +630,6 @@ public class Sucursales extends javax.swing.JFrame {
                 id_sucursal = capturarIdSucursal(nombreSucursal);
             }else{
             restablecer();
-            desactivarCampos();
         }
     }//GEN-LAST:event_cmb_sucursalesActionPerformed
 
@@ -644,7 +641,7 @@ public class Sucursales extends javax.swing.JFrame {
             txt_distancia.setEnabled(true);
             String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
             String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
-            String numeroIdentidad = partesInformacionSucursal[2].trim();
+            String numeroIdentidad = partesInformacionSucursal[1].trim();
             id_colaborador = capturarIdColaborador(numeroIdentidad);
             }
         else{
