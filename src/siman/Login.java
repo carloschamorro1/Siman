@@ -64,7 +64,7 @@ public class Login extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -258,7 +258,6 @@ public class Login extends javax.swing.JFrame {
             lbl_vercontraseña.setIcon(new javax.swing.ImageIcon("src\\Img\\ojo-cerrado.png"));
             txt_password.setEchoChar('*');
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_vercontraseñaMouseClicked
 
     private void lbl_contraseñaOlvidadaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseExited
@@ -268,18 +267,15 @@ public class Login extends javax.swing.JFrame {
         if(clickContraseñaOlvidada>=1){
             lbl_contraseñaOlvidada.setForeground(Color.blue);
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseExited
 
     private void lbl_contraseñaOlvidadaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseEntered
         lbl_contraseñaOlvidada.setForeground(new Color(205,63,145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseEntered
 
     private void lbl_contraseñaOlvidadaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseClicked
         lbl_contraseñaOlvidada.setForeground(Color.blue);
         clickContraseñaOlvidada++;
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseClicked
 
     private void btn_ingresarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_ingresarMousePressed
@@ -315,8 +311,6 @@ public class Login extends javax.swing.JFrame {
         }catch(Exception e){
                  JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } 
-
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_ingresarMousePressed
 
     private void btn_ingresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_ingresarMouseExited

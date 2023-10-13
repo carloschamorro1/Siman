@@ -26,7 +26,7 @@ import utilidades.Queries;
  *
  * @author Carlos
  */
-public class Sucursales extends javax.swing.JFrame {
+public class Asignaciones extends javax.swing.JFrame {
 
     Statement stmt = null;
     Connection con = null;
@@ -40,8 +40,11 @@ public class Sucursales extends javax.swing.JFrame {
 
     /**
      * Creates new form Sucursales
+     * @param nombreUsuario
+     * @param idColaborador
+     * @throws java.sql.SQLException
      */
-    public Sucursales(String nombreUsuario, int idColaborador) throws SQLException {
+    public Asignaciones(String nombreUsuario, int idColaborador) throws SQLException {
         initComponents();
         informacionGeneral();
         holders();
@@ -52,7 +55,7 @@ public class Sucursales extends javax.swing.JFrame {
         this.idColaboradorActivo = idColaborador;
     }
 
-    public Sucursales() throws SQLException {
+    public Asignaciones() throws SQLException {
         initComponents();
         informacionGeneral();
         holders();
@@ -98,13 +101,13 @@ public class Sucursales extends javax.swing.JFrame {
                 cmb_sucursales.addItem(lista.get(i));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private void limpiarColaboradores(){
         cmb_colaboradores.removeAllItems();
-        cmb_colaboradores.addItem("Seleccione al transportista");
+        cmb_colaboradores.addItem("Seleccione al colaborador");
     }
      
     public int capturarIdColaborador(String numeroIdentidad){
@@ -118,7 +121,7 @@ public class Sucursales extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -133,7 +136,7 @@ public class Sucursales extends javax.swing.JFrame {
                 return nombreColaborador;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return "";
     }
@@ -148,7 +151,7 @@ public class Sucursales extends javax.swing.JFrame {
                 return nombreSucursal;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return "";
     }
@@ -164,7 +167,7 @@ public class Sucursales extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -177,57 +180,10 @@ public class Sucursales extends javax.swing.JFrame {
                 cmb_colaboradores.addItem(lista.get(i));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
   
-    
-    private void rellenar() {
-        String input = "";
-        input = JOptionPane.showInputDialog(this, "¿Qué producto desea buscar?", "Consulta de producto", JOptionPane.QUESTION_MESSAGE);
-        if (input == null) {
-            JOptionPane.showMessageDialog(this, "La acción fue cancelada", "¡AVISO!", JOptionPane.INFORMATION_MESSAGE);
-        } else if (input.equals("")) {
-            JOptionPane.showMessageDialog(this, "Favor de ingresar los datos del producto\n que desea buscar", "¡AVISO!", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            String sql = "select * from inventario\n"
-                    + "where nombreproducto ='" + input + "'";
-            try {
-                stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-                if (rs.next()) {
-                    //txt_nombreProducto.setText(rs.getString("nombreproducto"));
-                    int cantidad = Integer.parseInt(rs.getString("cantidadstock"));
-                    //spi_cantidadProducto.setValue(cantidad);
-                    String tipoMovimiento = rs.getString("tipomovimiento");
-                    if (tipoMovimiento.equals("i")) {
-                        cmb_colaboradores.setSelectedItem("Ingreso");
-                    }
-                    if (tipoMovimiento.equals("r")) {
-                        cmb_colaboradores.setSelectedItem("Retiro");
-                    }
-                    txt_distancia.setText(rs.getString("precio"));
-                    colorear();
-                    habilitarAccionesBuscar();
-                } else {
-                    JOptionPane.showMessageDialog(null, "¡No se encuentra el producto! Por favor verifique sí, lo escribio correctamente");
-                }
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
-                Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    private void colorear() {
-        cmb_sucursales.setForeground(Color.black);
-        cmb_colaboradores.setForeground(Color.black);
-        txt_distancia.setForeground(Color.black);
-    }
-
-    private void habilitarAccionesBuscar() {
-        btn_asignar.setEnabled(false);
-    }
 
     private boolean estaVacio() {
         if (txt_distancia.getText().equals("Ingrese la distancia")) {
@@ -279,7 +235,7 @@ public class Sucursales extends javax.swing.JFrame {
                 return false;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
     }
@@ -426,42 +382,44 @@ public class Sucursales extends javax.swing.JFrame {
                 .addComponent(lbl_usuario)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbl_nombreUsuario)
-                .addGap(234, 234, 234)
-                .addComponent(lbl_tituloSucursales)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lbl_home)
-                .addGap(40, 40, 40))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(392, 392, 392)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lbl_sucursal1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(29, 29, 29))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(194, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(44, 44, 44)
-                .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(405, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbl_colaborador, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lbl_sucursal1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmb_colaboradores, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(cmb_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(161, 161, 161))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(lbl_tituloSucursales)
+                        .addGap(317, 317, 317))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbl_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(47, 47, 47)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbl_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_home, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(64, 64, 64)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbl_tituloSucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lbl_nombreUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(133, 133, 133)
+                        .addGap(17, 17, 17)
+                        .addComponent(lbl_nombreUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lbl_home, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(lbl_tituloSucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,26 +434,26 @@ public class Sucursales extends javax.swing.JFrame {
                             .addComponent(lbl_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txt_distancia, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
+                .addGap(28, 28, 28)
                 .addComponent(btn_asignar, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout kGradientPanel1Layout = new javax.swing.GroupLayout(kGradientPanel1);
         kGradientPanel1.setLayout(kGradientPanel1Layout);
         kGradientPanel1Layout.setHorizontalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(kGradientPanel1Layout.createSequentialGroup()
-                .addGap(38, 38, 38)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel1Layout.createSequentialGroup()
+                .addContainerGap(274, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(238, 238, 238))
         );
         kGradientPanel1Layout.setVerticalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(kGradientPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(62, 62, 62)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -528,9 +486,17 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_asignarMouseExited
 
     private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-        Principal principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
-        this.dispose();
-        principal.setVisible(true);
+
+        try {
+            this.dispose();
+            Principal principal;
+            principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
+            principal.setVisible(true);
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
@@ -677,23 +643,25 @@ public class Sucursales extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Asignaciones.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Asignaciones.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Asignaciones.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Asignaciones.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                new Sucursales().setVisible(true);
+                new Asignaciones().setVisible(true);
             } catch (SQLException ex) {
-                Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }

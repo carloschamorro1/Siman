@@ -92,7 +92,7 @@ public class Principal extends javax.swing.JFrame {
         kGradientPanel1 = new keeptoo.KGradientPanel();
         jPanel1 = new javax.swing.JPanel();
         lbl_nombreUsuario = new javax.swing.JLabel();
-        btn_sucursales = new javax.swing.JButton();
+        btn_asignaciones = new javax.swing.JButton();
         btn_reportes = new javax.swing.JButton();
         btn_viajes = new javax.swing.JButton();
         lbl_usuario = new javax.swing.JLabel();
@@ -111,20 +111,25 @@ public class Principal extends javax.swing.JFrame {
         lbl_nombreUsuario.setFont(new java.awt.Font("Roboto Black", 0, 24)); // NOI18N
         lbl_nombreUsuario.setText("Nombre de Usuario");
 
-        btn_sucursales.setBackground(new java.awt.Color(205, 63, 145));
-        btn_sucursales.setFont(new java.awt.Font("Roboto Black", 0, 24)); // NOI18N
-        btn_sucursales.setForeground(new java.awt.Color(255, 255, 255));
-        btn_sucursales.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btn_sucursales.setLabel("Sucursales");
-        btn_sucursales.addMouseListener(new java.awt.event.MouseAdapter() {
+        btn_asignaciones.setBackground(new java.awt.Color(205, 63, 145));
+        btn_asignaciones.setFont(new java.awt.Font("Roboto Black", 0, 24)); // NOI18N
+        btn_asignaciones.setForeground(new java.awt.Color(255, 255, 255));
+        btn_asignaciones.setText("Asignaciones");
+        btn_asignaciones.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn_asignaciones.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn_sucursalesMouseEntered(evt);
+                btn_asignacionesMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn_sucursalesMouseExited(evt);
+                btn_asignacionesMouseExited(evt);
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                btn_sucursalesMousePressed(evt);
+                btn_asignacionesMousePressed(evt);
+            }
+        });
+        btn_asignaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_asignacionesActionPerformed(evt);
             }
         });
 
@@ -202,13 +207,13 @@ public class Principal extends javax.swing.JFrame {
                         .addGap(291, 291, 291))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btn_sucursales, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_asignaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btn_reportes, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btn_viajes, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(325, 325, 325))))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btn_reportes, btn_sucursales, btn_viajes});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btn_asignaciones, btn_reportes, btn_viajes});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -225,7 +230,7 @@ public class Principal extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
                 .addComponent(lbl_tituloEmpleados, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
-                .addComponent(btn_sucursales)
+                .addComponent(btn_asignaciones)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_reportes, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -233,7 +238,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGap(126, 126, 126))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btn_reportes, btn_sucursales, btn_viajes});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btn_asignaciones, btn_reportes, btn_viajes});
 
         javax.swing.GroupLayout kGradientPanel1Layout = new javax.swing.GroupLayout(kGradientPanel1);
         kGradientPanel1.setLayout(kGradientPanel1Layout);
@@ -267,26 +272,26 @@ public class Principal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_sucursalesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_sucursalesMouseEntered
-        btn_sucursales.setBackground(new Color(156,2,91));
+    private void btn_asignacionesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMouseEntered
+        btn_asignaciones.setBackground(new Color(156,2,91));
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_sucursalesMouseEntered
+    }//GEN-LAST:event_btn_asignacionesMouseEntered
 
-    private void btn_sucursalesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_sucursalesMouseExited
-        btn_sucursales.setBackground(new Color(205,63,145));
+    private void btn_asignacionesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMouseExited
+        btn_asignaciones.setBackground(new Color(205,63,145));
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_sucursalesMouseExited
+    }//GEN-LAST:event_btn_asignacionesMouseExited
 
-    private void btn_sucursalesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_sucursalesMousePressed
-        btn_sucursales.setBackground(new Color(40,74,172));
+    private void btn_asignacionesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMousePressed
+        btn_asignaciones.setBackground(new Color(40,74,172));
         try {
-            Sucursales sucursales = new Sucursales(lbl_nombreUsuario.getText(), idColaboradorActivo);
+            Asignaciones asignaciones = new Asignaciones(lbl_nombreUsuario.getText(), idColaboradorActivo);
             this.dispose();
-            sucursales.setVisible(true);
+            asignaciones.setVisible(true);
         } catch (SQLException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btn_sucursalesMousePressed
+    }//GEN-LAST:event_btn_asignacionesMousePressed
 
     private void btn_reportesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_reportesMouseEntered
         btn_reportes.setBackground(new Color(156,2,91));
@@ -300,7 +305,13 @@ public class Principal extends javax.swing.JFrame {
 
     private void btn_reportesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_reportesMousePressed
         btn_reportes.setBackground(new Color(40,74,172));
-        
+        try {
+            Reportes reportes = new Reportes(lbl_nombreUsuario.getText(), idColaboradorActivo);
+            this.dispose();
+            reportes.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_btn_reportesMousePressed
 
     private void btn_viajesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_viajesMouseEntered
@@ -353,6 +364,10 @@ public class Principal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_cerrarSesionMouseExited
 
+    private void btn_asignacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_asignacionesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_asignacionesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -392,8 +407,8 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_asignaciones;
     private javax.swing.JButton btn_reportes;
-    private javax.swing.JButton btn_sucursales;
     private javax.swing.JButton btn_viajes;
     private javax.swing.JPanel jPanel1;
     private keeptoo.KGradientPanel kGradientPanel1;

@@ -16,26 +16,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.table.DefaultTableModel;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.view.JRSaveContributor;
-import net.sf.jasperreports.view.JRViewer;
-import net.sf.jasperreports.view.JasperViewer;
 import utilidades.Queries;
 
 /**
@@ -43,10 +31,7 @@ import utilidades.Queries;
  * @author Carlos
  */
 public class Viajes extends javax.swing.JFrame {
-    ArrayList<String> viajes = new ArrayList<String>();
-    int totalPrecioOrden;
     boolean facturaActiva = false;
-    Statement stmt = null;
     Connection con = null;
     int filaSeleccionada;
     int idColaboradorActivo;
@@ -59,8 +44,6 @@ public class Viajes extends javax.swing.JFrame {
     double distancia;
     double distanciaTotal;
     double total = 0;
-    double subtotal;
-    double isv;
     String nombreColaborador;
     String nombreSucursal;
     String fecha;
@@ -68,6 +51,9 @@ public class Viajes extends javax.swing.JFrame {
 
     /**
      * Creates new form Viajes
+     * @param nombreUsuario
+     * @param idColaboradorActivo
+     * @throws java.sql.SQLException
      */
     public Viajes(String nombreUsuario, int idColaboradorActivo) throws SQLException {
         initComponents();
@@ -97,14 +83,6 @@ public class Viajes extends javax.swing.JFrame {
         PlaceHolder holder;
     }
     
-    private String capturarFechaActual(){
-        //String fecha = jdt_fechaViaje.toString();
-        Calendar f;
-        f = Calendar.getInstance();
-        int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
-        String fecha = (año + "-" + mes + "-" + d);
-        return fecha;
-    }
     
     private void holders() {
         PlaceHolder holder;
@@ -119,7 +97,7 @@ public class Viajes extends javax.swing.JFrame {
                 cmb_sucursales.addItem(lista.get(i));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -149,7 +127,7 @@ public class Viajes extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -164,27 +142,11 @@ public class Viajes extends javax.swing.JFrame {
                 return nombreColaborador;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return "";
     }
     
-    private String capturarNombreSucursal(int id_sucursal){
-        try {
-            Statement st = con.createStatement();
-            String sql = "select nombre_sucursal from sucursales where id_sucursal = '"+id_sucursal+"'";
-            ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
-                nombreSucursal = rs.getString("nombre_sucursal");
-                return nombreSucursal;
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       return "";
-    }
-    
-
     private void actualizarTabla() {
         try {
             String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
@@ -251,8 +213,6 @@ public class Viajes extends javax.swing.JFrame {
         distancia = 0.0;
         distanciaTotal = 0.0;
         total = 0.0;
-        subtotal = 0.0;
-        isv = 0.0;
         nombreColaborador = "";
         nombreSucursal = "";
         fecha = "";
@@ -260,6 +220,7 @@ public class Viajes extends javax.swing.JFrame {
     }
     
     public void accionesCancelar(){
+        facturaActiva = false;
         variablesPorDefecto();
         txt_subtotal.setText("0");
         txt_isv.setText("0");
@@ -290,7 +251,7 @@ public class Viajes extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -306,7 +267,7 @@ public class Viajes extends javax.swing.JFrame {
                 return id;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return -1;
     }
@@ -336,7 +297,7 @@ public class Viajes extends javax.swing.JFrame {
                 return tarifa;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return 0.0;
     }
@@ -352,15 +313,14 @@ public class Viajes extends javax.swing.JFrame {
                 return distancia;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return 0.0;
     }
     
     public void guardarDetalle(){
         try { 
-            PreparedStatement ps;
-            ResultSet rs;    
+            PreparedStatement ps;  
             ps = con.prepareStatement("INSERT INTO viajes_detalle (id_viaje_encabezado, id_colaborador) " +
                                       "VALUES(?,?)");
             ps.setInt(1, idViaje);
@@ -432,10 +392,6 @@ public class Viajes extends javax.swing.JFrame {
         }*/
     }
     
-    public void actualizarTotal(double distanciaTotal){
-        
-    }
-    
     private void limpiarColaboradores(){
         cmb_colaboradores.removeAllItems();
         cmb_colaboradores.addItem("Seleccione al colaborador");
@@ -447,11 +403,6 @@ public class Viajes extends javax.swing.JFrame {
     }
     
     
-     private void limpiarTransportistas(){
-        cmb_transportistas.removeAllItems();
-        cmb_transportistas.addItem("Seleccione al transportista");
-    }
-    
     private void llenarColaboradoresPorSucursal(String nombreSucursal) {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -460,7 +411,7 @@ public class Viajes extends javax.swing.JFrame {
                 cmb_colaboradores.addItem(lista.get(i));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -472,7 +423,7 @@ public class Viajes extends javax.swing.JFrame {
                 cmb_transportistas.addItem(lista.get(i));
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -1068,17 +1019,17 @@ public class Viajes extends javax.swing.JFrame {
         kGradientPanel1.setLayout(kGradientPanel1Layout);
         kGradientPanel1Layout.setHorizontalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kGradientPanel1Layout.createSequentialGroup()
-                .addContainerGap(48, Short.MAX_VALUE)
+            .addGroup(kGradientPanel1Layout.createSequentialGroup()
+                .addGap(34, 34, 34)
                 .addComponent(jpn_principal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         kGradientPanel1Layout.setVerticalGroup(
             kGradientPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(kGradientPanel1Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addGap(16, 16, 16)
                 .addComponent(jpn_principal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1102,11 +1053,10 @@ public class Viajes extends javax.swing.JFrame {
         btn_eliminarViaje.setBackground(new Color(40, 74, 172));
         try {
             PreparedStatement ps;
-            ResultSet rs;
             ps = con.prepareStatement("Delete viajes_detalle\n"
                 + "where id_viaje_detalle =?");
-            String idDetalle = tbl_viajes.getValueAt(filaSeleccionada, 0).toString();
-            int id = Integer.parseInt(idDetalle);
+            String idViajeDetalle = tbl_viajes.getValueAt(filaSeleccionada, 0).toString();
+            int id = Integer.parseInt(idViajeDetalle);
             ps.setInt(1, id);
             int res = ps.executeUpdate();
             if (res > 0) {
@@ -1247,7 +1197,6 @@ public class Viajes extends javax.swing.JFrame {
                 int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
                 fecha = (año + "-" + mes + "-" + d);
                 PreparedStatement ps;
-                ResultSet rs;
                 double totalInicial = 0;
                 ps = con.prepareStatement("INSERT INTO viajes_encabezado (id_colaborador, id_transportista, fecha_viaje, total_viaje) " +
                                           "VALUES(?,?,?,?)");
@@ -1449,9 +1398,16 @@ public class Viajes extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "No puede regresar mientras un viaje activo, si desea salir, presione cancelar.","Viaje activo",JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        Principal principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
-        this.dispose();
-        principal.setVisible(true);
+        
+        try {
+            this.dispose();
+            Principal principal;
+            principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
+            principal.setVisible(true);
+        } catch (SQLException ex) {
+            Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
@@ -1481,7 +1437,6 @@ public class Viajes extends javax.swing.JFrame {
     private void cmb_transportistasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmb_transportistasMouseEntered
         if(jdt_fechaViaje.getCalendar()==null){
                 JOptionPane.showMessageDialog(rootPane, "Por favor, seleccione una fecha","Fecha necesaria",JOptionPane.INFORMATION_MESSAGE);
-                return;
             }
         // TODO add your handling code here:
     }//GEN-LAST:event_cmb_transportistasMouseEntered
