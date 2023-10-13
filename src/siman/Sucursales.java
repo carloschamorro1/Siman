@@ -31,16 +31,17 @@ public class Sucursales extends javax.swing.JFrame {
     Statement stmt = null;
     Connection con = null;
     ArrayList<String> colaboradores = new ArrayList<String>();
-    int id_colaborador;
-    int id_sucursal;
+    int idColaborador;
+    int idSucursal;
     int cifrasDecimales;
     String nombreColaborador;
     String nombreSucursal;
+    int idColaboradorActivo;
 
     /**
      * Creates new form Sucursales
      */
-    public Sucursales(String nombreUsuario) throws SQLException {
+    public Sucursales(String nombreUsuario, int idColaborador) throws SQLException {
         initComponents();
         informacionGeneral();
         holders();
@@ -48,6 +49,7 @@ public class Sucursales extends javax.swing.JFrame {
         desactivarCampos();
         lbl_nombreUsuario.setText(nombreUsuario);
         this.con = ConexionBD.obtenerConexion();
+        this.idColaboradorActivo = idColaborador;
     }
 
     public Sucursales() throws SQLException {
@@ -78,7 +80,7 @@ public class Sucursales extends javax.swing.JFrame {
     }
 
     private void informacionGeneral() {
-        this.setTitle("Inventario");
+        this.setTitle("Sucursales");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
     }
@@ -264,7 +266,7 @@ public class Sucursales extends javax.swing.JFrame {
     public boolean sucursalYaAsignadaAColaborador(){
         try {
             Statement st = con.createStatement();
-            String sql = "select * from asignaciones where id_colaborador = '"+id_colaborador+"' and id_sucursal = '"+id_sucursal+"'";
+            String sql = "select * from asignaciones where id_colaborador = '"+idColaborador+"' and id_sucursal = '"+idSucursal+"'";
             ResultSet rs = st.executeQuery(sql);
             if(rs.next()){
                 JOptionPane.showMessageDialog(null, "El colaborador ya tiene asignada esta sucursal", "Sucursal ya asignada", JOptionPane.INFORMATION_MESSAGE);
@@ -526,7 +528,7 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_asignarMouseExited
 
     private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-        Principal principal = new Principal(lbl_nombreUsuario.getText());
+        Principal principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
         this.dispose();
         principal.setVisible(true);
         // TODO add your handling code here:
@@ -560,14 +562,14 @@ public class Sucursales extends javax.swing.JFrame {
 
             ps = con.prepareStatement("INSERT INTO asignaciones (id_colaborador, id_sucursal, distancia) " +
                                        "VALUES(?,?,?)");
-            ps.setInt(1, id_colaborador);
-            ps.setInt(2, id_sucursal);
+            ps.setInt(1, idColaborador);
+            ps.setInt(2, idSucursal);
             ps.setDouble(3, Double.parseDouble(txt_distancia.getText().trim()));
            
             int res = ps.executeUpdate();
             if (res > 0) {
-                nombreColaborador = capturarNombreColaborador(id_colaborador);
-                nombreSucursal = capturarNombreSucursal(id_sucursal);
+                nombreColaborador = capturarNombreColaborador(idColaborador);
+                nombreSucursal = capturarNombreSucursal(idSucursal);
                 JOptionPane.showMessageDialog(this, "Se ha asigando la distancia: " +txt_distancia.getText().trim()
                         + "km a el/la empleado/a: " + nombreColaborador + " en la sucursal: " + nombreSucursal +".");
                 restablecer();
@@ -627,7 +629,7 @@ public class Sucursales extends javax.swing.JFrame {
                 String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
                 String nombreSucursal = partesInformacionSucursal[0].trim();
                 llenarColaboradores();
-                id_sucursal = capturarIdSucursal(nombreSucursal);
+                idSucursal = capturarIdSucursal(nombreSucursal);
             }else{
             restablecer();
         }
@@ -642,7 +644,7 @@ public class Sucursales extends javax.swing.JFrame {
             String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
             String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
             String numeroIdentidad = partesInformacionSucursal[1].trim();
-            id_colaborador = capturarIdColaborador(numeroIdentidad);
+            idColaborador = capturarIdColaborador(numeroIdentidad);
             }
         else{
             txt_distancia.setEnabled(false);

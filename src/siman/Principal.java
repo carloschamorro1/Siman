@@ -5,8 +5,13 @@
  */
 package siman;
 
+import bd.ConexionBD;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -22,21 +27,57 @@ public class Principal extends javax.swing.JFrame {
      * Creates new form Principal
      * @param nombreUsuario
      */
+    int idColaboradorActivo;
+    boolean esGerente;
+    Connection con = null;
  
-    public Principal(String nombreUsuario){
+    public Principal(String nombreUsuario, int idColaborador) throws SQLException{
         initComponents();
         informacionGeneral();
         lbl_nombreUsuario.setText(nombreUsuario);
+        btn_viajes.setVisible(false);
+        this.idColaboradorActivo = idColaborador;
+        this.con = ConexionBD.obtenerConexion();
+        if(esGerente(idColaborador)){
+            btn_viajes.setVisible(true);
+        }
     }
 
-    public Principal() {
-        
+    public Principal() throws SQLException {
+        initComponents();
+        informacionGeneral();
+        btn_viajes.setVisible(false);
+        this.con = ConexionBD.obtenerConexion();
     }
     
      public final void informacionGeneral(){
         this.setTitle("Menú Principal");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
+    }
+     
+    public boolean esGerente(int colaborador){
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_colaborador from colaboradores as c " +
+                         "join puestos as p " +
+                         "on c.id_puesto = p.id_puesto " +
+                         "where p.puesto = 'Gerente de tienda'";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                int idColaborador = rs.getInt("id_colaborador");
+                    if(idColaborador == colaborador){
+                        esGerente = true;
+                        return esGerente;
+                    }else{
+                         esGerente = false;
+                    }
+            }
+            return esGerente;
+        } catch (SQLException ex) {
+            Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     /**
@@ -187,9 +228,9 @@ public class Principal extends javax.swing.JFrame {
                 .addComponent(btn_sucursales)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_reportes, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_viajes, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(120, 120, 120))
+                .addGap(126, 126, 126))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btn_reportes, btn_sucursales, btn_viajes});
@@ -239,7 +280,7 @@ public class Principal extends javax.swing.JFrame {
     private void btn_sucursalesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_sucursalesMousePressed
         btn_sucursales.setBackground(new Color(40,74,172));
         try {
-            Sucursales sucursales = new Sucursales(lbl_nombreUsuario.getText());
+            Sucursales sucursales = new Sucursales(lbl_nombreUsuario.getText(), idColaboradorActivo);
             this.dispose();
             sucursales.setVisible(true);
         } catch (SQLException ex) {
@@ -276,7 +317,7 @@ public class Principal extends javax.swing.JFrame {
         btn_viajes.setBackground(new Color(40,74,172));
         Viajes viaje;
         try {
-            viaje = new Viajes(lbl_nombreUsuario.getText());
+            viaje = new Viajes(lbl_nombreUsuario.getText(), idColaboradorActivo);
             this.dispose();
             viaje.setVisible(true);
         } catch (SQLException ex) {
@@ -342,7 +383,11 @@ public class Principal extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new Principal().setVisible(true);
+            try {
+                new Principal().setVisible(true);
+            } catch (SQLException ex) {
+                Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 

@@ -29,6 +29,7 @@ public class Login extends javax.swing.JFrame {
     Connection con;
     int click = 0;
     int clickContraseñaOlvidada = 0;
+    int idColaboradorActivo;
     
     /**
      * Creates new form Login
@@ -50,6 +51,22 @@ public class Login extends javax.swing.JFrame {
         this.setTitle("Login");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
+    }
+    
+    public int capturarIdColaboradorPorNombreUsuario(String nombreUsuario){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_colaborador from usuarios where nombre_usuario = '"+nombreUsuario+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_colaborador"));
+                return id;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
     }
     
 
@@ -117,11 +134,6 @@ public class Login extends javax.swing.JFrame {
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 btn_ingresarMousePressed(evt);
-            }
-        });
-        btn_ingresar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ingresarActionPerformed(evt);
             }
         });
 
@@ -289,8 +301,9 @@ public class Login extends javax.swing.JFrame {
                 return;
             }
             if(rs.next()){
+                idColaboradorActivo = capturarIdColaboradorPorNombreUsuario(txt_usuario.getText());
                 this.dispose();
-                Principal principal = new Principal(txt_usuario.getText());
+                Principal principal = new Principal(txt_usuario.getText(),idColaboradorActivo);
                 principal.setVisible(true);
             }
             else{
@@ -319,10 +332,6 @@ public class Login extends javax.swing.JFrame {
     private void txt_usuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_usuarioActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_usuarioActionPerformed
-
-    private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_ingresarActionPerformed
 
     /**
      * @param args the command line arguments
