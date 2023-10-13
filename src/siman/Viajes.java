@@ -40,6 +40,7 @@ public class Viajes extends javax.swing.JFrame {
     int idTransportista;
     int idViaje;
     int idDetalle;
+    int idAsignacion;
     double tarifa;
     double distancia;
     double distanciaTotal;
@@ -145,6 +146,22 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
        return "";
+    }
+    
+    public int capturarIdAsignacion(int idColaborador, int idSucursal){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_asignacion from asignaciones where id_colaborador = '"+idColaborador+"' and id_sucursal ='"+idSucursal+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_asignacion"));
+                return id;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
     }
     
     private void actualizarTabla() {
@@ -319,12 +336,14 @@ public class Viajes extends javax.swing.JFrame {
     }
     
     public void guardarDetalle(){
+        idAsignacion = capturarIdAsignacion(idColaboradorRegistrado,idSucursal);
         try { 
             PreparedStatement ps;  
-            ps = con.prepareStatement("INSERT INTO viajes_detalle (id_viaje_encabezado, id_colaborador) " +
-                                      "VALUES(?,?)");
+            ps = con.prepareStatement("INSERT INTO viajes_detalle (id_viaje_encabezado, id_colaborador,id_asignacion) " +
+                                      "VALUES(?,?,?)");
             ps.setInt(1, idViaje);
             ps.setInt(2, idColaboradorRegistrado);
+            ps.setInt(3, idAsignacion);
             int res = ps.executeUpdate();
             if (res > 0) {  
                 Statement st = con.createStatement();
@@ -361,35 +380,6 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
         }
         return false;
-    }
-    
-    public void imprimirFactura(){
-        /*try {
-            JasperReport reporte = null;
-            String path = "src\\reportes\\factura.jasper";
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("numeroFactura",lbl_idFactura.getText());
-            parameters.put("cai","35BD6A-0195F4-B34BAA-8B7D13-37791A-2D");
-            reporte = (JasperReport) JRLoader.loadObjectFromFile(path);
-            JasperPrint jprint;
-            jprint=JasperFillManager.fillReport(reporte,parameters,con);
-            JasperViewer view = new JasperViewer(jprint,false);
-            final JRViewer viewer = new JRViewer(jprint);
-            JRSaveContributor[] contrbs = viewer.getSaveContributors();
-
-            for (JRSaveContributor saveContributor : contrbs)
-            {
-                if (!(saveContributor instanceof net.sf.jasperreports.view.save.JRDocxSaveContributor ||
-                    saveContributor instanceof net.sf.jasperreports.view.save.JRSingleSheetXlsSaveContributor
-                    || saveContributor instanceof net.sf.jasperreports.view.save.JRPdfSaveContributor))
-            viewer.removeSaveContributor(saveContributor);
-        }
-        view.setContentPane(viewer);
-        view.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        view.setVisible(true);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,e.getMessage());
-        }*/
     }
     
     private void limpiarColaboradores(){

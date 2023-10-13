@@ -6,20 +6,26 @@
 package siman;
 
 import bd.ConexionBD;
-import com.placeholder.PlaceHolder;
 import java.awt.Color;
-import java.awt.Toolkit;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JRSaveContributor;
+import net.sf.jasperreports.view.JRViewer;
+import net.sf.jasperreports.view.JasperViewer;
 import utilidades.Queries;
 
 /**
@@ -31,11 +37,14 @@ public class Reportes extends javax.swing.JFrame {
     Statement stmt = null;
     Connection con = null;
     ArrayList<String> colaboradores = new ArrayList<String>();
-    int idColaborador;
+    int idTransportista;
     int idSucursal;
-    int cifrasDecimales;
-    String nombreColaborador;
-    String nombreSucursal;
+    String numeroIdentidadTransportista;
+    String fechaInicial;
+    String fechaFinal;
+    String nombreTransportista;
+    String fechaInicialFormateada;
+    String fechaFinalFormateada;
     int idColaboradorActivo;
 
     /**
@@ -71,16 +80,130 @@ public class Reportes extends javax.swing.JFrame {
         }
     }
     
+    private void restablecer(){
+        cmb_transportistas.setSelectedItem("Seleccione al transportista");
+        jdt_fechaInicial.setCalendar(null);
+        jdt_fechaFinal.setCalendar(null);
+    }
+    
     private void informacionGeneral() {
         this.setTitle("Sucursales");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
     }
-
-
-    private void habilitarAccionesBuscar() {
-        btn_generar.setEnabled(false);
+    
+    private void validarDatosRellenados(){
+        if(cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
+            JOptionPane.showMessageDialog(null, "Por favor seleccione un transportista","Transportista necesario",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(jdt_fechaInicial.getCalendar() == null){
+            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha inicial","Fecha inicial necesaria",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if(jdt_fechaFinal.getCalendar() == null){
+            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha final","Fecha final necesaria",JOptionPane.WARNING_MESSAGE);
+        }
     }
+    
+    private void validarFechas(){
+        if(jdt_fechaInicial.getCalendar() == null || jdt_fechaFinal.getCalendar() == null){
+            return;
+        }
+        if(jdt_fechaInicial.getDate().equals(jdt_fechaFinal.getDate())){
+            return;
+        }    
+        if(!jdt_fechaInicial.getDate().before(jdt_fechaFinal.getDate())){
+            JOptionPane.showMessageDialog(null, "La fecha final no puede ser antes que la inicial","Inconsistencia de fechas",JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    
+    public double calcularTotal(int idTransportista, String fechaInicial, String fechaFinal) {
+        double total = 0;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select total_viaje from viajes_encabezado as ve "
+                    + "where id_transportista = '" + idTransportista + "' and fecha_viaje between '" + fechaInicial + "' and '" + fechaFinal + "';";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                total += rs.getDouble("total_viaje");
+            }
+            return total;
+        } catch (SQLException ex) {
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+    
+    public void imprimirReporte(){
+        try {
+            Calendar f = jdt_fechaInicial.getCalendar();
+            int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
+            fechaInicial = (d + "/" + mes + "/" + año);
+            
+            Calendar f2 = jdt_fechaFinal.getCalendar();
+            int d2 = f2.get(Calendar.DATE), mes2 = 1 + (f2.get(Calendar.MONTH)), año2 = f2.get(Calendar.YEAR);
+            fechaFinal = (d2 + "/" + mes2 + "/" + año2);
+            
+            Calendar fFormateado = jdt_fechaInicial.getCalendar();
+            int diaFormateado = fFormateado.get(Calendar.DATE), mesFormateado = 1 + (fFormateado.get(Calendar.MONTH)), añoFormateado = fFormateado.get(Calendar.YEAR);
+            fechaInicialFormateada = (añoFormateado + "-" + mesFormateado + "-" + diaFormateado);
+
+            Calendar fFormateado2 = jdt_fechaFinal.getCalendar();
+            int diaFormateado2 = fFormateado2.get(Calendar.DATE), mesFormateado2 = 1 + (fFormateado2.get(Calendar.MONTH)), añoFormateado2 = fFormateado2.get(Calendar.YEAR);
+            fechaFinalFormateada = (añoFormateado2 + "-" + mesFormateado2 + "-" + diaFormateado2);
+            
+            double total = calcularTotal(idTransportista,fechaInicialFormateada, fechaFinalFormateada);
+            
+            JasperReport reporte = null;
+            String path = "src\\reportes\\reporte.jasper";
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("fechaInicialFormulario",fechaInicial);
+            parameters.put("fechaFinalFormulario",fechaFinal);
+            parameters.put("transportista",nombreTransportista);
+            parameters.put("colaborador", lbl_nombreUsuario.getText());
+            parameters.put("total",Double.toString(total));
+            parameters.put("idTransportista",idTransportista);
+            parameters.put("fechaInicialBD",fechaInicialFormateada);
+            parameters.put("fechaFinalBD",fechaFinalFormateada);
+            reporte = (JasperReport) JRLoader.loadObjectFromFile(path);
+            JasperPrint jprint;
+            jprint=JasperFillManager.fillReport(reporte,parameters,con);
+            JasperViewer view = new JasperViewer(jprint,false);
+            final JRViewer viewer = new JRViewer(jprint);
+            JRSaveContributor[] contrbs = viewer.getSaveContributors();
+
+            for (JRSaveContributor saveContributor : contrbs)
+            {
+                if (!(saveContributor instanceof net.sf.jasperreports.view.save.JRDocxSaveContributor ||
+                    saveContributor instanceof net.sf.jasperreports.view.save.JRSingleSheetXlsSaveContributor
+                    || saveContributor instanceof net.sf.jasperreports.view.save.JRPdfSaveContributor))
+            viewer.removeSaveContributor(saveContributor);
+        }
+        view.setContentPane(viewer);
+        view.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        view.setVisible(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,e.getMessage());
+        }
+    }
+    
+        private int capturarIdTransportista(String numeroIdentidad){
+        int id;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '"+numeroIdentidad+"'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                id = Integer.parseInt(rs.getString("id_transportista"));
+                return id;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return -1;
+    }
+
 
 
     /**
@@ -216,13 +339,6 @@ public class Reportes extends javax.swing.JFrame {
                 .addGap(16, 16, 16)
                 .addGroup(jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpn_principalLayout.createSequentialGroup()
-                        .addComponent(lbl_usuario)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lbl_nombreUsuario)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbl_home)
-                        .addGap(21, 21, 21))
-                    .addGroup(jpn_principalLayout.createSequentialGroup()
                         .addGroup(jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jpn_principalLayout.createSequentialGroup()
                                 .addGap(76, 76, 76)
@@ -244,11 +360,20 @@ public class Reportes extends javax.swing.JFrame {
                                         .addGap(6, 6, 6)))))
                         .addGap(18, 18, 18)
                         .addComponent(lbl_limpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(33, Short.MAX_VALUE))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpn_principalLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lbl_tituloReportes)
-                .addGap(280, 280, 280))
+                        .addContainerGap(33, Short.MAX_VALUE))
+                    .addGroup(jpn_principalLayout.createSequentialGroup()
+                        .addComponent(lbl_usuario)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jpn_principalLayout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(lbl_tituloReportes)
+                                .addGap(280, 280, 280))
+                            .addGroup(jpn_principalLayout.createSequentialGroup()
+                                .addComponent(lbl_nombreUsuario)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lbl_home)
+                                .addGap(21, 21, 21))))))
         );
         jpn_principalLayout.setVerticalGroup(
             jpn_principalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -341,29 +466,9 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_homeMousePressed
 
     private void lbl_limpiarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_limpiarMouseClicked
-        //restablecer();
+        restablecer();
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_limpiarMouseClicked
-
-    private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
-
-        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
-            /*limpiarSucursales();
-            llenarSucursales();
-            String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
-            String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
-            String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
-            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
-            String numeroIdentidadTransportista = partesInformacionTransportistas[1].trim();
-            idTransportista = capturarIdTransportista(numeroIdentidadTransportista);
-            tarifa = llenarTarifa(numeroIdentidadTransportista);
-            txt_tarifa.setText(Double.toString(tarifa));
-            cmb_transportistas.setEnabled(false);
-            btn_limpiar.setEnabled(true);
-            jdt_fechaViaje.setEnabled(true);
-            lbl_iniciar.setEnabled(true);*/
-        }
-    }//GEN-LAST:event_cmb_transportistasActionPerformed
 
     private void jdt_fechaInicialMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaInicialMouseEntered
         if(jdt_fechaInicial.getCalendar()!=null){
@@ -396,8 +501,24 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_jdt_fechaFinalMousePressed
 
     private void btn_generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_generarActionPerformed
-        
+        validarDatosRellenados();
+        validarFechas();
+        imprimirReporte();
+        restablecer();
     }//GEN-LAST:event_btn_generarActionPerformed
+
+    private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
+        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
+            String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
+            String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
+            String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
+            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
+            nombreTransportista = partesInformacionTransportistas[0].trim();
+            numeroIdentidadTransportista = partesInformacionTransportistas[1].trim();
+            idTransportista = capturarIdTransportista(numeroIdentidadTransportista);
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmb_transportistasActionPerformed
 
     /**
      * @param args the command line arguments
