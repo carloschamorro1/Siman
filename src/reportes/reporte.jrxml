@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6c72c97f-f0a4-44d7-82e1-732d4cd3bfdb">
-	<property name="ireport.zoom" value="2.143588810000016"/>
+	<property name="ireport.zoom" value="2.8531167061100238"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="262"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -19,6 +19,7 @@
 	</parameter>
 	<parameter name="fechaFinalBD" class="java.lang.String"/>
 	<parameter name="total" class="java.lang.String"/>
+	<parameter name="distanciaTotal" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[select ve.fecha_viaje, c.nombre_colaborador +' '+ c.apellido_colaborador as 'nombre_colaborador', 
 s.nombre_sucursal, c.numero_identidad_colaborador, a.distancia, t.id_transportista from viajes_encabezado as ve
@@ -247,20 +248,34 @@ order by ve.fecha_viaje asc]]>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="42" splitType="Stretch">
+		<band height="66" splitType="Stretch">
 			<staticText>
-				<reportElement x="11" y="12" width="50" height="23" uuid="0e710a58-0874-4dba-94db-7b8a6e398202"/>
-				<textElement>
+				<reportElement x="95" y="12" width="50" height="23" uuid="0e710a58-0874-4dba-94db-7b8a6e398202"/>
+				<textElement textAlignment="Right">
 					<font fontName="Arial" size="14"/>
 				</textElement>
-				<text><![CDATA[Total L]]></text>
+				<text><![CDATA[Total L:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="61" y="12" width="188" height="23" uuid="6070f576-b028-4627-97a0-9652e03b9ab2"/>
+				<reportElement x="151" y="12" width="188" height="23" uuid="6070f576-b028-4627-97a0-9652e03b9ab2"/>
 				<textElement>
 					<font fontName="Arial" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="11" y="35" width="134" height="23" uuid="eee28367-4cfc-4a8b-8117-567aec807c2c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[Distancia total (Km):]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="151" y="35" width="188" height="23" uuid="a17e4dd2-4fd0-42dc-873c-cbd87421f49c"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{distanciaTotal}]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>

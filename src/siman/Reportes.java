@@ -137,6 +137,34 @@ public class Reportes extends javax.swing.JFrame {
         }
         return -1;
     }
+    
+    public double calcularDistanciaTotal(int idTransportista, String fechaInicial, String fechaFinal) {
+        double total = 0;
+        try {
+            Statement st = con.createStatement();
+            String sql = "select a.distancia from viajes_encabezado as ve "
+                    + "inner join viajes_detalle as vd "
+                    + "on ve.id_viaje_encabezado = vd.id_viaje_encabezado "
+                    + "inner join asignaciones as a "
+                    + "on a.id_asignacion = vd.id_asignacion "
+                    + "inner join sucursales as s "
+                    + "on s.id_sucursal = a.id_sucursal "
+                    + "inner join colaboradores as c "
+                    + "on c.id_colaborador = vd.id_colaborador "
+                    + "inner join transportistas as t "
+                    + "on ve.id_transportista = t.id_transportista "
+                    + "where t.id_transportista = '"+idTransportista+"' and fecha_viaje between '"+fechaInicial+"' and '"+fechaFinal+"'"
+                    + "order by ve.fecha_viaje asc";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                total += rs.getDouble("distancia");
+            }
+            return total;
+        } catch (SQLException ex) {
+            Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
 
     public void imprimirReporte() {
         try {
@@ -157,6 +185,10 @@ public class Reportes extends javax.swing.JFrame {
             fechaFinalFormateada = (añoFormateado2 + "-" + mesFormateado2 + "-" + diaFormateado2);
 
             double total = calcularTotal(idTransportista, fechaInicialFormateada, fechaFinalFormateada);
+            double distanciaTotal = calcularDistanciaTotal(idTransportista, fechaInicialFormateada, fechaFinalFormateada);
+            
+            String totalFormateado = String.format("%.2f", total);
+            String distanciaTotalFormateada = String.format("%.2f", distanciaTotal);
             JasperReport reporte = null;
             String path = "src\\reportes\\reporte.jasper";
             Map<String, Object> parameters = new HashMap<>();
@@ -164,10 +196,11 @@ public class Reportes extends javax.swing.JFrame {
             parameters.put("fechaFinalFormulario", fechaFinal);
             parameters.put("transportista", nombreTransportista);
             parameters.put("colaborador", lbl_nombreUsuario.getText());
-            parameters.put("total", Double.toString(total));
+            parameters.put("total", totalFormateado);
             parameters.put("idTransportista", idTransportista);
             parameters.put("fechaInicialBD", fechaInicialFormateada);
             parameters.put("fechaFinalBD", fechaFinalFormateada);
+            parameters.put("distanciaTotal",distanciaTotalFormateada);
             reporte = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint jprint;
             jprint = JasperFillManager.fillReport(reporte, parameters, con);
