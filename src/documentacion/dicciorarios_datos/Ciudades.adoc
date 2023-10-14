@@ -1,0 +1,12 @@
+== Diccionario de Ciudades
+
+Tabla: ciudades
+
+[options="header"]
+|=======
+|Dato en BD             | Tipo de dato          | Descripción                           | Observación
+| id_ciudad             | int(10)               | Identificador de la ciudad            | autoincrement
+| ciudad                | varchar(100)          | Nombre de la ciudad                   |
+|=======
+
+Campos clave: id_ciudad (PK)

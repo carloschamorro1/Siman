@@ -1,0 +1,17 @@
+== Diccionario de Colaboradores
+
+Tabla: colaboradores
+
+[options="header"]
+|=======
+|Dato en BD                                     | Tipo de dato                  | Descripción                                           | Observación
+| id_colaborador                                | int(10)                       | Identificador del colaborador                         | autoincrement
+| nombre_colaborador                            | varchar(50)                   | Nombre del colaborador                                |
+| apellido_colaborador                          | varchar(50)                   | apellido del colaborador                              |
+| numero_identidad_colaborador                  | varchar(13)                   | Número de identidad del colaborador                   | Sin guiones (Unique Key)
+| id_puesto                                     | int(10)                       | Identificador del puesto asignado al colaborador      | Llave foránea de la tabla puestos
+|=======
+
+Relaciones: puesto
+
+Campos clave: id_colaborador (PK), id_puesto (FK), numero_identidad_colaborador (UQ)

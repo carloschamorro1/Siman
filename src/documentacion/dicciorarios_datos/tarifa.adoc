@@ -1,0 +1,12 @@
+== Diccionario de Tarifa
+
+Tabla: tarifa
+
+[options="header"]
+|=======
+|Dato en BD             | Tipo de dato          | Descripción                           | Observación
+| id_tarifa             | int(10)               | Identificador de la tarifa            | autoincrement
+| tarifa                | money                 | Nombre de la tarifa                   |
+|=======
+
+Campos clave: id_ciudad (PK)

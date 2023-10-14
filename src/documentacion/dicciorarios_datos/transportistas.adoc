@@ -1,0 +1,16 @@
+== Diccionario de Transportistas
+
+Tabla: transportistas
+
+[options="header"]
+|=======
+|Dato en BD                         | Tipo de dato      | Descripción                                                           | Observación
+| id_transportista                  | int(10)           | Identificador del transportista                                       |
+| nombre_transportista              | varchar(100)      | Nombre del transportista                                              |
+| id_tarifa                         | int(10)           | Identificador de la tarifa asignada al transportista                  | Llave foránea de la tabla tarifa
+| numero_identidad_transportista    | varchar(13)       | Número de identidad del transportista                                 | Sin guiones (Unique Key)
+|=======
+
+Relaciones: tarifa
+
+Campos clave: id_transportista (PK), id_tarifa (FK), numero_identidad_transportista (UQ)

@@ -1,0 +1,16 @@
+== Diccionario de Viajes detalle
+
+Tabla: viajes_detalle
+
+[options="header"]
+|=======
+|Dato en BD                 | Tipo de dato      | Descripción                                                           | Observación
+| id_viaje_detalle          | int(10)           | Identificador del detalle del viaje                                   |
+| id_viaje_encabezado       | int(10)           | Nombre del encabezado del viaje                                       | Llave foránea de la tabla viajes_encabezado
+| id_colaborador            | int(10)           | Identificador del colaborador que está viajando                       | Llave foránea de la tabla colaboradores
+| id_asignacion             | int(10)           | Identificador de la asignación del colaborador que está viajando      | Llave foránea de la tabla asignaciones
+|=======
+
+Relaciones: viajes_encabezado,colaboradores,asignaciones
+
+Campos clave: id_viaje_detalle (PK), id_viaje_encabezado (FK), id_colaborador (FK), id_asignacion (FK)

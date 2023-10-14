@@ -1,0 +1,12 @@
+== Diccionario de Puestos
+
+Tabla: puestos
+
+[options="header"]
+|=======
+|Dato en BD             | Tipo de dato          | Descripción                 | Observación
+| id_puesto             | int(10)               | Identificador del puesto    | autoincrement
+| puesto                | varchar(100)          | Nombre del puesto           | Unique Key
+|=======
+
+Campos clave: id_puesto (PK), puesto (UQ)

@@ -1,0 +1,14 @@
+== Diccionario de Usuario
+
+Tabla: usuario
+[options="header"]
+|========
+|Dato en BD                 | Tipo de dato   | Descripción                              | Observación
+| nombre_usuario            | varchar(50)    | Nombre de usuario del colaborador        | El nombre de usuario posee el formato (nombre.apellido)
+| password_usuario          | varchar(40)    | Contraseña del colaborador               | La data esta encriptada en MD5 y la contraseña es el mismo usuario
+| id_colaborador            | int(10)        | Identificador del colaborador            | Llave foránea de tabla colaboradores
+|========
+
+Relaciones: colaboradores
+
+Campos clave: nombre_usuario (PK), id_colaborador (FK)

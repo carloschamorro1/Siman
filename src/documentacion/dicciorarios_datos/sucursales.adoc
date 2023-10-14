@@ -1,0 +1,16 @@
+== Diccionario de Sucursales
+
+Tabla: sucursales
+
+[options="header"]
+|=======
+|Dato en BD             | Tipo de dato      | Descripción                                                           | Observación
+| id_sucursal           | int(10)           | Identificador de la sucursal                                          |
+| nombre_sucursal       | varchar(100)      | Nombre de la sucursal                                                 |
+| direccion_sucursal    | varchar(200)      | Dirección de la sucursal                                              | Unique Key
+| id_ciudad             | int(10)           | Identificador de la ciudad donde se encuentra la sucursal             | Llave foránea de la tabla ciudad
+|=======
+
+Relaciones: ciudades
+
+Campos clave: id_sucursal (PK), id_ciudad (FK), nombre_sucursal (FK)
