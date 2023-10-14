@@ -1,0 +1,16 @@
+== Diccionario de Asignaciones
+
+Tabla: asignaciones
+
+[options="header"]
+|=======
+|Dato en BD             | Tipo de dato      | Descripción                                                                   | Observación
+| id_asignacion         | int(10)           | Identificador de la asignación                                                |
+| id_colaborador        | int(10)           | Identificador del colaborador al que se le asigna la distancia                | Llave foránea de la tabla colaboradores
+| id_sucursal           | int(10)           | Identificador de la sucursal que se va a asignar                              | Llave foránea de la tabla sucursales
+| distancia             | decimal(4,2)      | Distancia entre la sucursal y la casa del colaborador que se ha asignadado    | Distancia en km
+|=======
+
+Relaciones: colaboradores, sucursales
+
+Campos clave: id_asignacion (PK), id_colaborador (FK), id_sucursal (FK)
