@@ -38,7 +38,6 @@ public class Reportes extends javax.swing.JFrame {
     Connection con = null;
     ArrayList<String> colaboradores = new ArrayList<String>();
     int idTransportista;
-    int idSucursal;
     String numeroIdentidadTransportista;
     String fechaInicial;
     String fechaFinal;
@@ -48,7 +47,11 @@ public class Reportes extends javax.swing.JFrame {
     int idColaboradorActivo;
 
     /**
-     * Creates new form Sucursales
+     * Creates new form Reportes
+     *
+     * @param nombreUsuario
+     * @param idColaborador
+     * @throws java.sql.SQLException
      */
     public Reportes(String nombreUsuario, int idColaborador) throws SQLException {
         initComponents();
@@ -67,7 +70,7 @@ public class Reportes extends javax.swing.JFrame {
         this.con = ConexionBD.obtenerConexion();
         llenarTransportistas();
     }
-    
+
     private void llenarTransportistas() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -79,45 +82,45 @@ public class Reportes extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private void restablecer(){
+
+    private void restablecer() {
         cmb_transportistas.setSelectedItem("Seleccione al transportista");
         jdt_fechaInicial.setCalendar(null);
         jdt_fechaFinal.setCalendar(null);
     }
-    
+
     private void informacionGeneral() {
         this.setTitle("Sucursales");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
     }
-    
-    private void validarDatosRellenados(){
-        if(cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
-            JOptionPane.showMessageDialog(null, "Por favor seleccione un transportista","Transportista necesario",JOptionPane.WARNING_MESSAGE);
+
+    private void validarDatosRellenados() {
+        if (cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")) {
+            JOptionPane.showMessageDialog(null, "Por favor seleccione un transportista", "Transportista necesario", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if(jdt_fechaInicial.getCalendar() == null){
-            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha inicial","Fecha inicial necesaria",JOptionPane.WARNING_MESSAGE);
+        if (jdt_fechaInicial.getCalendar() == null) {
+            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha inicial", "Fecha inicial necesaria", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if(jdt_fechaFinal.getCalendar() == null){
-            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha final","Fecha final necesaria",JOptionPane.WARNING_MESSAGE);
+        if (jdt_fechaFinal.getCalendar() == null) {
+            JOptionPane.showMessageDialog(null, "Por favor seleccione una fecha final", "Fecha final necesaria", JOptionPane.WARNING_MESSAGE);
         }
     }
-    
-    private void validarFechas(){
-        if(jdt_fechaInicial.getCalendar() == null || jdt_fechaFinal.getCalendar() == null){
+
+    private void validarFechas() {
+        if (jdt_fechaInicial.getCalendar() == null || jdt_fechaFinal.getCalendar() == null) {
             return;
         }
-        if(jdt_fechaInicial.getDate().equals(jdt_fechaFinal.getDate())){
+        if (jdt_fechaInicial.getDate().equals(jdt_fechaFinal.getDate())) {
             return;
-        }    
-        if(!jdt_fechaInicial.getDate().before(jdt_fechaFinal.getDate())){
-            JOptionPane.showMessageDialog(null, "La fecha final no puede ser antes que la inicial","Inconsistencia de fechas",JOptionPane.WARNING_MESSAGE);
+        }
+        if (!jdt_fechaInicial.getDate().before(jdt_fechaFinal.getDate())) {
+            JOptionPane.showMessageDialog(null, "La fecha final no puede ser antes que la inicial", "Inconsistencia de fechas", JOptionPane.WARNING_MESSAGE);
         }
     }
-    
+
     public double calcularTotal(int idTransportista, String fechaInicial, String fechaFinal) {
         double total = 0;
         try {
@@ -134,17 +137,17 @@ public class Reportes extends javax.swing.JFrame {
         }
         return -1;
     }
-    
-    public void imprimirReporte(){
+
+    public void imprimirReporte() {
         try {
             Calendar f = jdt_fechaInicial.getCalendar();
             int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
             fechaInicial = (d + "/" + mes + "/" + año);
-            
+
             Calendar f2 = jdt_fechaFinal.getCalendar();
             int d2 = f2.get(Calendar.DATE), mes2 = 1 + (f2.get(Calendar.MONTH)), año2 = f2.get(Calendar.YEAR);
             fechaFinal = (d2 + "/" + mes2 + "/" + año2);
-            
+
             Calendar fFormateado = jdt_fechaInicial.getCalendar();
             int diaFormateado = fFormateado.get(Calendar.DATE), mesFormateado = 1 + (fFormateado.get(Calendar.MONTH)), añoFormateado = fFormateado.get(Calendar.YEAR);
             fechaInicialFormateada = (añoFormateado + "-" + mesFormateado + "-" + diaFormateado);
@@ -152,59 +155,56 @@ public class Reportes extends javax.swing.JFrame {
             Calendar fFormateado2 = jdt_fechaFinal.getCalendar();
             int diaFormateado2 = fFormateado2.get(Calendar.DATE), mesFormateado2 = 1 + (fFormateado2.get(Calendar.MONTH)), añoFormateado2 = fFormateado2.get(Calendar.YEAR);
             fechaFinalFormateada = (añoFormateado2 + "-" + mesFormateado2 + "-" + diaFormateado2);
-            
-            double total = calcularTotal(idTransportista,fechaInicialFormateada, fechaFinalFormateada);
-            
+
+            double total = calcularTotal(idTransportista, fechaInicialFormateada, fechaFinalFormateada);
             JasperReport reporte = null;
             String path = "src\\reportes\\reporte.jasper";
             Map<String, Object> parameters = new HashMap<>();
-            parameters.put("fechaInicialFormulario",fechaInicial);
-            parameters.put("fechaFinalFormulario",fechaFinal);
-            parameters.put("transportista",nombreTransportista);
+            parameters.put("fechaInicialFormulario", fechaInicial);
+            parameters.put("fechaFinalFormulario", fechaFinal);
+            parameters.put("transportista", nombreTransportista);
             parameters.put("colaborador", lbl_nombreUsuario.getText());
-            parameters.put("total",Double.toString(total));
-            parameters.put("idTransportista",idTransportista);
-            parameters.put("fechaInicialBD",fechaInicialFormateada);
-            parameters.put("fechaFinalBD",fechaFinalFormateada);
+            parameters.put("total", Double.toString(total));
+            parameters.put("idTransportista", idTransportista);
+            parameters.put("fechaInicialBD", fechaInicialFormateada);
+            parameters.put("fechaFinalBD", fechaFinalFormateada);
             reporte = (JasperReport) JRLoader.loadObjectFromFile(path);
             JasperPrint jprint;
-            jprint=JasperFillManager.fillReport(reporte,parameters,con);
-            JasperViewer view = new JasperViewer(jprint,false);
+            jprint = JasperFillManager.fillReport(reporte, parameters, con);
+            JasperViewer view = new JasperViewer(jprint, false);
             final JRViewer viewer = new JRViewer(jprint);
             JRSaveContributor[] contrbs = viewer.getSaveContributors();
 
-            for (JRSaveContributor saveContributor : contrbs)
-            {
-                if (!(saveContributor instanceof net.sf.jasperreports.view.save.JRDocxSaveContributor ||
-                    saveContributor instanceof net.sf.jasperreports.view.save.JRSingleSheetXlsSaveContributor
-                    || saveContributor instanceof net.sf.jasperreports.view.save.JRPdfSaveContributor))
-            viewer.removeSaveContributor(saveContributor);
-        }
-        view.setContentPane(viewer);
-        view.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        view.setVisible(true);
+            for (JRSaveContributor saveContributor : contrbs) {
+                if (!(saveContributor instanceof net.sf.jasperreports.view.save.JRDocxSaveContributor
+                        || saveContributor instanceof net.sf.jasperreports.view.save.JRSingleSheetXlsSaveContributor
+                        || saveContributor instanceof net.sf.jasperreports.view.save.JRPdfSaveContributor)) {
+                    viewer.removeSaveContributor(saveContributor);
+                }
+            }
+            view.setContentPane(viewer);
+            view.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            view.setVisible(true);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
-    
-        private int capturarIdTransportista(String numeroIdentidad){
+
+    private int capturarIdTransportista(String numeroIdentidad) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '"+numeroIdentidad+"'";
+            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '" + numeroIdentidad + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_transportista"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -296,31 +296,9 @@ public class Reportes extends javax.swing.JFrame {
 
         jdt_fechaInicial.setDateFormatString("dd/MM/yyyy");
         jdt_fechaInicial.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
-        jdt_fechaInicial.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jdt_fechaInicialMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jdt_fechaInicialMouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jdt_fechaInicialMousePressed(evt);
-            }
-        });
 
         jdt_fechaFinal.setDateFormatString("dd/MM/yyyy");
         jdt_fechaFinal.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
-        jdt_fechaFinal.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jdt_fechaFinalMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jdt_fechaFinalMouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jdt_fechaFinalMousePressed(evt);
-            }
-        });
 
         lbl_fechaInicial.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         lbl_fechaInicial.setText("Fecha inicial");
@@ -440,65 +418,27 @@ public class Reportes extends javax.swing.JFrame {
 
     private void btn_generarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_generarMouseEntered
         btn_generar.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_generarMouseEntered
 
     private void btn_generarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_generarMouseExited
         btn_generar.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_generarMouseExited
 
     private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-
         try {
             this.dispose();
             Principal principal;
             principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
             principal.setVisible(true);
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        // TODO add your handling code here:
-        
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
     private void lbl_limpiarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_limpiarMouseClicked
         restablecer();
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_limpiarMouseClicked
-
-    private void jdt_fechaInicialMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaInicialMouseEntered
-        if(jdt_fechaInicial.getCalendar()!=null){
-            //lbl_iniciar.setEnabled(true);
-        }
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jdt_fechaInicialMouseEntered
-
-    private void jdt_fechaInicialMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaInicialMouseExited
-        if(jdt_fechaInicial.getCalendar()!=null){
-            //lbl_iniciar.setEnabled(true);
-        }
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jdt_fechaInicialMouseExited
-
-    private void jdt_fechaInicialMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaInicialMousePressed
-        JOptionPane.showMessageDialog(null, "Click","Viaje activo",JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_jdt_fechaInicialMousePressed
-
-    private void jdt_fechaFinalMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaFinalMouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jdt_fechaFinalMouseEntered
-
-    private void jdt_fechaFinalMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaFinalMouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jdt_fechaFinalMouseExited
-
-    private void jdt_fechaFinalMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaFinalMousePressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jdt_fechaFinalMousePressed
 
     private void btn_generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_generarActionPerformed
         validarDatosRellenados();
@@ -508,16 +448,15 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_generarActionPerformed
 
     private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
-        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
+        if (!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")) {
             String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
             String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
             String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
-            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
+            String[] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
             nombreTransportista = partesInformacionTransportistas[0].trim();
             numeroIdentidadTransportista = partesInformacionTransportistas[1].trim();
             idTransportista = capturarIdTransportista(numeroIdentidadTransportista);
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_cmb_transportistasActionPerformed
 
     /**

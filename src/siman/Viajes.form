@@ -441,9 +441,6 @@
                       <Image iconType="3" name="/Img/calendar.png"/>
                     </Property>
                   </Properties>
-                  <Events>
-                    <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lbl_fechaViajeMousePressed"/>
-                  </Events>
                 </Component>
                 <Component class="com.toedter.calendar.JDateChooser" name="jdt_fechaViaje">
                   <Properties>
@@ -455,7 +452,6 @@
                   <Events>
                     <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaViajeMouseEntered"/>
                     <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaViajeMouseExited"/>
-                    <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaViajeMousePressed"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="lbl_transportistas">

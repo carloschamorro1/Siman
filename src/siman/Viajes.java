@@ -5,7 +5,6 @@
  */
 package siman;
 
-
 import bd.ConexionBD;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.placeholder.PlaceHolder;
@@ -31,6 +30,7 @@ import utilidades.Queries;
  * @author Carlos
  */
 public class Viajes extends javax.swing.JFrame {
+
     boolean facturaActiva = false;
     Connection con = null;
     int filaSeleccionada;
@@ -52,6 +52,7 @@ public class Viajes extends javax.swing.JFrame {
 
     /**
      * Creates new form Viajes
+     *
      * @param nombreUsuario
      * @param idColaboradorActivo
      * @throws java.sql.SQLException
@@ -66,7 +67,7 @@ public class Viajes extends javax.swing.JFrame {
         llenarSucursales();
         this.idColaboradorActivo = idColaboradorActivo;
     }
-    
+
     public Viajes() throws SQLException {
         initComponents();
         holders();
@@ -83,13 +84,12 @@ public class Viajes extends javax.swing.JFrame {
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
         PlaceHolder holder;
     }
-    
-    
+
     private void holders() {
         PlaceHolder holder;
         holder = new PlaceHolder(txt_distancia, Color.gray, Color.black, "Distancia", false, "Roboto", 25);
     }
-    
+
     private void llenarSucursales() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -101,7 +101,7 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void limpiar() {
         cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
         cmb_sucursales.setSelectedItem("Seleccione la sucursal");
@@ -109,92 +109,89 @@ public class Viajes extends javax.swing.JFrame {
         txt_tarifa.setText("0");
         txt_total.setText("0");
     }
-    
+
     private void restablecer() {
         limpiar();
         holders();
         restablecerComboBoxes();
         variablesPorDefecto();
     }
-    
-    public int capturarIdColaboradorQueViaja(String numeroIdentidad){
+
+    public int capturarIdColaboradorQueViaja(String numeroIdentidad) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '"+numeroIdentidad+"'";
+            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '" + numeroIdentidad + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_colaborador"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
-    public String capturarNombreColaborador(int id_colaborador){
+
+    public String capturarNombreColaborador(int id_colaborador) {
         try {
             Statement st = con.createStatement();
-            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '"+id_colaborador+"'";
+            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '" + id_colaborador + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 nombreColaborador = rs.getString("nombre_colaborador") + " " + rs.getString("apellido_colaborador");
                 return nombreColaborador;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return "";
+        return "";
     }
-    
-    public int capturarIdAsignacion(int idColaborador, int idSucursal){
+
+    public int capturarIdAsignacion(int idColaborador, int idSucursal) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_asignacion from asignaciones where id_colaborador = '"+idColaborador+"' and id_sucursal ='"+idSucursal+"'";
+            String sql = "select id_asignacion from asignaciones where id_colaborador = '" + idColaborador + "' and id_sucursal ='" + idSucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_asignacion"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
+
     private void actualizarTabla() {
         try {
             String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
             String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
             String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
-            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
+            String[] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
             String nombreTransportista = partesInformacionTransportistas[0].trim();
-            
-            
             DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
-                String[] datos = new String[6];
-                datos[0] = Integer.toString(idDetalle);
-                datos[1] = nombreTransportista;
-                datos[2] = nombreSucursal;
-                datos[3] = nombreColaborador;
-                datos[4] = numeroIdentidadColaborador;
-                datos[5] = txt_distancia.getText();
-                model.addRow(datos);
-                btn_limpiar.setEnabled(false);
+            String[] datos = new String[6];
+            datos[0] = Integer.toString(idDetalle);
+            datos[1] = nombreTransportista;
+            datos[2] = nombreSucursal;
+            datos[3] = nombreColaborador;
+            datos[4] = numeroIdentidadColaborador;
+            datos[5] = txt_distancia.getText();
+            model.addRow(datos);
+            btn_limpiar.setEnabled(false);
         } catch (Exception e) {
             System.err.println(e);
         }
     }
-    
-    public void restablecerComboBoxes(){
+
+    public void restablecerComboBoxes() {
         cmb_colaboradores.setEnabled(false);
         cmb_sucursales.setEnabled(false);
     }
 
-    
-    public void accionesIniciar(){
+    public void accionesIniciar() {
         lbl_iniciar.setEnabled(false);
         btn_cancelarViaje.setEnabled(true);
         btn_finalizarViaje.setEnabled(true);
@@ -203,8 +200,8 @@ public class Viajes extends javax.swing.JFrame {
         cmb_sucursales.setEnabled(true);
         facturaActiva = true;
     }
-    
-    public void botonesPorDefecto(){
+
+    public void botonesPorDefecto() {
         lbl_iniciar.setEnabled(false);
         btn_limpiar.setEnabled(false);
         btn_cancelarViaje.setEnabled(false);
@@ -212,14 +209,14 @@ public class Viajes extends javax.swing.JFrame {
         btn_finalizarViaje.setEnabled(false);
         btn_agregarColaborador.setEnabled(false);
     }
-    
+
     public void deleteAllRows(final DefaultTableModel model) {
-        for( int i = model.getRowCount() - 1; i >= 0; i-- ) {
+        for (int i = model.getRowCount() - 1; i >= 0; i--) {
             model.removeRow(i);
         }
     }
-    
-    public void variablesPorDefecto(){
+
+    public void variablesPorDefecto() {
         filaSeleccionada = 0;
         idColaboradorRegistrado = 0;
         idSucursal = 0;
@@ -235,8 +232,8 @@ public class Viajes extends javax.swing.JFrame {
         fecha = "";
         numeroIdentidadColaborador = "";
     }
-    
-    public void accionesCancelar(){
+
+    public void accionesCancelar() {
         facturaActiva = false;
         variablesPorDefecto();
         txt_subtotal.setText("0");
@@ -256,39 +253,39 @@ public class Viajes extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) tbl_viajes.getModel();
         deleteAllRows(model);
     }
-    
-    private int capturarIdSucursal(String nombreSucursal){
+
+    private int capturarIdSucursal(String nombreSucursal) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_sucursal from sucursales where nombre_sucursal = '"+nombreSucursal+"'";
+            String sql = "select id_sucursal from sucursales where nombre_sucursal = '" + nombreSucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_sucursal"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
-    private int capturarIdTransportista(String numeroIdentidad){
+
+    private int capturarIdTransportista(String numeroIdentidad) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '"+numeroIdentidad+"'";
+            String sql = "select id_transportista from transportistas where numero_identidad_transportista = '" + numeroIdentidad + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_transportista"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
+
     public void capturarIdViaje() {
         try {
             Statement st = con.createStatement();
@@ -301,79 +298,78 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public double llenarTarifa(String numeroIdentidadTransportista){
+
+    public double llenarTarifa(String numeroIdentidadTransportista) {
         try {
             Statement st = con.createStatement();
-            String sql = "select ta.tarifa from transportistas as tr " +
-                        "join tarifa as ta on tr.id_tarifa = ta.id_tarifa "
-                        +"where tr.numero_identidad_transportista = '"+numeroIdentidadTransportista+"'";
+            String sql = "select ta.tarifa from transportistas as tr "
+                    + "join tarifa as ta on tr.id_tarifa = ta.id_tarifa "
+                    + "where tr.numero_identidad_transportista = '" + numeroIdentidadTransportista + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 tarifa = rs.getDouble("tarifa");
                 return tarifa;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return 0.0;
+        return 0.0;
     }
-    
-    public double llenarDistancia(int idColaborador, int idSucursal){
+
+    public double llenarDistancia(int idColaborador, int idSucursal) {
         try {
             Statement st = con.createStatement();
-            String sql = "select distancia from asignaciones " +
-                         "where id_colaborador = '"+idColaborador+"' and id_sucursal = '"+idSucursal+"'";
+            String sql = "select distancia from asignaciones "
+                    + "where id_colaborador = '" + idColaborador + "' and id_sucursal = '" + idSucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 distancia = rs.getDouble("distancia");
                 return distancia;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return 0.0;
+        return 0.0;
     }
-    
-    public void guardarDetalle(){
-        idAsignacion = capturarIdAsignacion(idColaboradorRegistrado,idSucursal);
-        try { 
-            PreparedStatement ps;  
-            ps = con.prepareStatement("INSERT INTO viajes_detalle (id_viaje_encabezado, id_colaborador,id_asignacion) " +
-                                      "VALUES(?,?,?)");
+
+    public void guardarDetalle() {
+        idAsignacion = capturarIdAsignacion(idColaboradorRegistrado, idSucursal);
+        try {
+            PreparedStatement ps;
+            ps = con.prepareStatement("INSERT INTO viajes_detalle (id_viaje_encabezado, id_colaborador,id_asignacion) "
+                    + "VALUES(?,?,?)");
             ps.setInt(1, idViaje);
             ps.setInt(2, idColaboradorRegistrado);
             ps.setInt(3, idAsignacion);
             int res = ps.executeUpdate();
-            if (res > 0) {  
+            if (res > 0) {
                 Statement st = con.createStatement();
                 String sql = "Select top 1 * from viajes_detalle order by id_viaje_detalle desc";
                 ResultSet rs1 = st.executeQuery(sql);
                 if (rs1.next()) {
-                     idDetalle = (rs1.getInt("id_viaje_detalle"));
+                    idDetalle = (rs1.getInt("id_viaje_detalle"));
                 }
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }
-    
-    public boolean colaboradorYaAsignado(String fecha, int colaborador){
+
+    public boolean colaboradorYaAsignado(String fecha, int colaborador) {
         try {
             Statement st = con.createStatement();
-            String sql = "select * from viajes_encabezado as ve " +
-                        "join viajes_detalle as vd " +
-                        "on ve.id_viaje_encabezado = vd.id_viaje_encabezado " +
-                        "where ve.fecha_viaje = '"+fecha+"' and vd.id_colaborador = "+colaborador+"";
+            String sql = "select * from viajes_encabezado as ve "
+                    + "join viajes_detalle as vd "
+                    + "on ve.id_viaje_encabezado = vd.id_viaje_encabezado "
+                    + "where ve.fecha_viaje = '" + fecha + "' and vd.id_colaborador = " + colaborador + "";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 Calendar f = jdt_fechaViaje.getCalendar();
                 int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
                 String fechaFormateada = (d + "/" + mes + "/" + año);
-                JOptionPane.showMessageDialog(null, "El empleado ya posee un viaje programado para el día: "+ fechaFormateada, "Viaje ya programado", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "El empleado ya posee un viaje programado para el día: " + fechaFormateada, "Viaje ya programado", JOptionPane.INFORMATION_MESSAGE);
                 return true;
-            }
-            else{
+            } else {
                 return false;
             }
         } catch (SQLException ex) {
@@ -381,18 +377,17 @@ public class Viajes extends javax.swing.JFrame {
         }
         return false;
     }
-    
-    private void limpiarColaboradores(){
+
+    private void limpiarColaboradores() {
         cmb_colaboradores.removeAllItems();
         cmb_colaboradores.addItem("Seleccione al colaborador");
     }
-    
-    private void limpiarSucursales(){
+
+    private void limpiarSucursales() {
         cmb_sucursales.removeAllItems();
         cmb_sucursales.addItem("Seleccione la sucursal");
     }
-    
-    
+
     private void llenarColaboradoresPorSucursal(String nombreSucursal) {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -404,7 +399,7 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void llenarTransportistas() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -416,7 +411,6 @@ public class Viajes extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -587,11 +581,6 @@ public class Viajes extends javax.swing.JFrame {
         });
 
         lbl_fechaViaje.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/calendar.png"))); // NOI18N
-        lbl_fechaViaje.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lbl_fechaViajeMousePressed(evt);
-            }
-        });
 
         jdt_fechaViaje.setDateFormatString("dd/MM/yyyy");
         jdt_fechaViaje.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
@@ -601,9 +590,6 @@ public class Viajes extends javax.swing.JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 jdt_fechaViajeMouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jdt_fechaViajeMousePressed(evt);
             }
         });
 
@@ -1044,7 +1030,7 @@ public class Viajes extends javax.swing.JFrame {
         try {
             PreparedStatement ps;
             ps = con.prepareStatement("Delete viajes_detalle\n"
-                + "where id_viaje_detalle =?");
+                    + "where id_viaje_detalle =?");
             String idViajeDetalle = tbl_viajes.getValueAt(filaSeleccionada, 0).toString();
             int id = Integer.parseInt(idViajeDetalle);
             ps.setInt(1, id);
@@ -1058,7 +1044,6 @@ public class Viajes extends javax.swing.JFrame {
                 for (int i = 0; i < totalFilas; i++) {
                     distanciaTotal += Double.parseDouble(tbl_viajes.getValueAt(i, 5).toString());
                 }
-                
                 double nuevoTotal = tarifa * distanciaTotal;
                 String totalFormateado = String.format("%.2f", nuevoTotal);
                 String distanciaFormateada = String.format("%.2f", distanciaTotal);
@@ -1068,48 +1053,42 @@ public class Viajes extends javax.swing.JFrame {
             }
 
         } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
-
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_eliminarViajeActionPerformed
 
     private void btn_eliminarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseExited
         btn_eliminarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_eliminarViajeMouseExited
 
     private void btn_eliminarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_eliminarViajeMouseEntered
         btn_eliminarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_eliminarViajeMouseEntered
 
     private void btn_finalizarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_finalizarViajeActionPerformed
         btn_finalizarViaje.setBackground(new Color(40, 74, 172));
-        try{
+        try {
             double totalViaje = Double.parseDouble(txt_total.getText());
             Statement st = con.createStatement();
-            String sql = "Update viajes_encabezado " +
-                "set total_viaje = '"+totalViaje+"'"
-                + "where id_viaje_encabezado =  '"+idViaje+"'";
+            String sql = "Update viajes_encabezado "
+                    + "set total_viaje = '" + totalViaje + "'"
+                    + "where id_viaje_encabezado =  '" + idViaje + "'";
             int res = st.executeUpdate(sql);
             if (res > 0) {
                 JOptionPane.showMessageDialog(this, "Viaje finalizado");
                 accionesCancelar();
             }
-        }catch(Exception e){
-               JOptionPane.showMessageDialog(this, e.getMessage());     
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
         }
     }//GEN-LAST:event_btn_finalizarViajeActionPerformed
 
     private void btn_finalizarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_finalizarViajeMouseExited
         btn_finalizarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_finalizarViajeMouseExited
 
     private void btn_finalizarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_finalizarViajeMouseEntered
         btn_finalizarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_finalizarViajeMouseEntered
 
     private void btn_limpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_limpiarActionPerformed
@@ -1123,92 +1102,80 @@ public class Viajes extends javax.swing.JFrame {
         btn_cancelarViaje.setEnabled(false);
         btn_finalizarViaje.setEnabled(false);
         lbl_iniciar.setEnabled(false);
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_limpiarActionPerformed
 
     private void btn_limpiarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_limpiarMouseExited
         btn_limpiar.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_limpiarMouseExited
 
     private void btn_limpiarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_limpiarMouseEntered
         btn_limpiar.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_limpiarMouseEntered
 
     private void btn_cancelarViajeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarViajeActionPerformed
         btn_cancelarViaje.setBackground(new Color(40, 74, 172));
         facturaActiva = false;
         try {
-                PreparedStatement ps;
-                ps = con.prepareStatement("Delete viajes_detalle "
-                        + "where id_viaje_encabezado =?");   
-                ps.setInt(1, idViaje);
-                
-                PreparedStatement ps2;
-                ps2 = con.prepareStatement("Delete viajes_encabezado "
-                        + "where id_viaje_encabezado =?");   
-                ps2.setInt(1, idViaje);
-                int res = ps.executeUpdate();
-                int res2 = ps2.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Viaje cancelado");
-                accionesCancelar();  
-
-            }catch (Exception e) {
-                
-            }
-
-        // TODO add your handling code here:
+            PreparedStatement ps;
+            ps = con.prepareStatement("Delete viajes_detalle "
+                    + "where id_viaje_encabezado =?");
+            ps.setInt(1, idViaje);
+            PreparedStatement ps2;
+            ps2 = con.prepareStatement("Delete viajes_encabezado "
+                    + "where id_viaje_encabezado =?");
+            ps2.setInt(1, idViaje);
+            int res = ps.executeUpdate();
+            int res2 = ps2.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Viaje cancelado");
+            accionesCancelar();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }//GEN-LAST:event_btn_cancelarViajeActionPerformed
 
     private void btn_cancelarViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancelarViajeMouseExited
         btn_cancelarViaje.setBackground(new Color(205, 63, 145));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_cancelarViajeMouseExited
 
     private void btn_cancelarViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_cancelarViajeMouseEntered
         btn_cancelarViaje.setBackground(new Color(156, 2, 91));
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_cancelarViajeMouseEntered
 
     private void tbl_viajesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_viajesMouseClicked
         btn_eliminarViaje.setEnabled(true);
         filaSeleccionada = tbl_viajes.getSelectedRow();
-        // TODO add your handling code here:
     }//GEN-LAST:event_tbl_viajesMouseClicked
 
     private void lbl_iniciarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_iniciarMouseClicked
-        if(!lbl_iniciar.isEnabled()){
-            return;     
+        if (!lbl_iniciar.isEnabled()) {
+            return;
         }
-            try {
-                jdt_fechaViaje.setEnabled(false);
-                Calendar f = jdt_fechaViaje.getCalendar();
-                int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
-                fecha = (año + "-" + mes + "-" + d);
-                PreparedStatement ps;
-                double totalInicial = 0;
-                ps = con.prepareStatement("INSERT INTO viajes_encabezado (id_colaborador, id_transportista, fecha_viaje, total_viaje) " +
-                                          "VALUES(?,?,?,?)");
-                ps.setInt(1, idColaboradorActivo);
-                ps.setInt(2, idTransportista);
-                ps.setString(3, fecha);
-                ps.setDouble(4, totalInicial);
-                int res = ps.executeUpdate();
-                if (res > 0) {
-                    capturarIdViaje();
-                    accionesIniciar();
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, e.getMessage());
-            }    
-        
+        try {
+            jdt_fechaViaje.setEnabled(false);
+            Calendar f = jdt_fechaViaje.getCalendar();
+            int d = f.get(Calendar.DATE), mes = 1 + (f.get(Calendar.MONTH)), año = f.get(Calendar.YEAR);
+            fecha = (año + "-" + mes + "-" + d);
+            PreparedStatement ps;
+            double totalInicial = 0;
+            ps = con.prepareStatement("INSERT INTO viajes_encabezado (id_colaborador, id_transportista, fecha_viaje, total_viaje) "
+                    + "VALUES(?,?,?,?)");
+            ps.setInt(1, idColaboradorActivo);
+            ps.setInt(2, idTransportista);
+            ps.setString(3, fecha);
+            ps.setDouble(4, totalInicial);
+            int res = ps.executeUpdate();
+            if (res > 0) {
+                capturarIdViaje();
+                accionesIniciar();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }//GEN-LAST:event_lbl_iniciarMouseClicked
 
     private void cmb_transportistasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_transportistasActionPerformed
-
-        if(!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")){
-            if(jdt_fechaViaje.getCalendar()==null){
+        if (!cmb_transportistas.getSelectedItem().toString().equals("Seleccione al transportista")) {
+            if (jdt_fechaViaje.getCalendar() == null) {
                 JOptionPane.showMessageDialog(rootPane, "Seleccione una fecha");
                 return;
             }
@@ -1217,11 +1184,11 @@ public class Viajes extends javax.swing.JFrame {
             String informacionTransportista = cmb_transportistas.getSelectedItem().toString();
             String reemplazarInformacionTransportistas = informacionTransportista.replace("(", "|");
             String informacionTransportistaFormateada = reemplazarInformacionTransportistas.replace(")", "|");
-            String [] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
+            String[] partesInformacionTransportistas = informacionTransportistaFormateada.split("\\|");
             String numeroIdentidadTransportista = partesInformacionTransportistas[1].trim();
             idTransportista = capturarIdTransportista(numeroIdentidadTransportista);
             tarifa = llenarTarifa(numeroIdentidadTransportista);
-            txt_tarifa.setText(Double.toString(tarifa));   
+            txt_tarifa.setText(Double.toString(tarifa));
             cmb_transportistas.setEnabled(false);
             btn_limpiar.setEnabled(true);
             jdt_fechaViaje.setEnabled(true);
@@ -1234,23 +1201,23 @@ public class Viajes extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_transportistasMousePressed
 
     private void btn_agregarColaboradorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_agregarColaboradorActionPerformed
-        try{
+        try {
             double nuevaDistancia = distanciaTotal + Double.parseDouble(txt_distancia.getText());
-            if(colaboradorYaAsignado(fecha,idColaboradorRegistrado)){
+            if (colaboradorYaAsignado(fecha, idColaboradorRegistrado)) {
                 cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
                 txt_distancia.setText("Distancia");
                 return;
             }
-            if(nuevaDistancia > 100){
-                JOptionPane.showMessageDialog(null,"Un viaje no puede acumular mas de 100 km.","Límite de kilómetros",JOptionPane.ERROR_MESSAGE);
+            if (nuevaDistancia > 100) {
+                JOptionPane.showMessageDialog(null, "Un viaje no puede acumular mas de 100 km.", "Límite de kilómetros", JOptionPane.ERROR_MESSAGE);
                 cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
                 txt_distancia.setText("Distancia");
                 return;
             }
-            
+
             guardarDetalle();
             actualizarTabla();
-            
+
             double totalNuevo = distancia * tarifa;
             total += totalNuevo;
             String totalFormateado = String.format("%.2f", total);
@@ -1263,8 +1230,8 @@ public class Viajes extends javax.swing.JFrame {
             cmb_colaboradores.setEnabled(false);
             cmb_sucursales.setSelectedItem("Seleccione la sucursal");
             btn_agregarColaborador.setEnabled(false);
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null,e.getMessage());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_agregarColaboradorActionPerformed
@@ -1282,37 +1249,37 @@ public class Viajes extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_agregarColaboradorMouseEntered
 
     private void txt_distanciaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_distanciaKeyTyped
-        char a=evt.getKeyChar();
+        char a = evt.getKeyChar();
 
-        if(evt.getKeyChar() == 46){
-            if(txt_distancia.getText().equals("")){
+        if (evt.getKeyChar() == 46) {
+            if (txt_distancia.getText().equals("")) {
                 evt.consume();
                 Toolkit.getDefaultToolkit().beep();
                 return;
             }
-            if(txt_distancia.getText().contains(".")){
+            if (txt_distancia.getText().contains(".")) {
                 evt.consume();
                 Toolkit.getDefaultToolkit().beep();
                 return;
             }
         }
 
-        if(txt_distancia.getText().length() >=5){
+        if (txt_distancia.getText().length() >= 5) {
             evt.consume();
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos","Límite de entrada",JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos", "Límite de entrada", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        if (evt.getKeyChar() == 8 || evt.getKeyChar() == 127 ||
-            evt.getKeyChar() == 0 || evt.getKeyChar() == 3 || evt.getKeyChar() == 22
-            || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 44 || evt.getKeyChar() == 46) {
+        if (evt.getKeyChar() == 8 || evt.getKeyChar() == 127
+                || evt.getKeyChar() == 0 || evt.getKeyChar() == 3 || evt.getKeyChar() == 22
+                || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 44 || evt.getKeyChar() == 46) {
             return;
         }
 
-        if(Character.isLetter(a) || !Character.isLetterOrDigit(a)){
+        if (Character.isLetter(a) || !Character.isLetterOrDigit(a)) {
             evt.consume();
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Sólo numeros","Restricción de entrada",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Sólo numeros", "Restricción de entrada", JOptionPane.ERROR_MESSAGE);
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_distanciaKeyTyped
@@ -1326,25 +1293,24 @@ public class Viajes extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_distanciaMousePressed
 
     private void cmb_colaboradoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_colaboradoresActionPerformed
-        if(cmb_colaboradores.getItemCount() ==0){
+        if (cmb_colaboradores.getItemCount() == 0) {
             return;
         }
-        if(txt_distanciaTotal.getText().equals("0")){
+        if (txt_distanciaTotal.getText().equals("0")) {
             txt_total.setText("0");
         }
-        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){
+        if (!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")) {
             String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
-            String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
-            
+            String[] partesInformacionSucursal = informacionColaboradores.split("\\|");
+
             nombreColaborador = partesInformacionSucursal[0].trim();
             numeroIdentidadColaborador = partesInformacionSucursal[2].trim();
             idColaboradorRegistrado = capturarIdColaboradorQueViaja(numeroIdentidadColaborador);
-            distancia = llenarDistancia(idColaboradorRegistrado,idSucursal);
-            txt_distancia.setText(Double.toString(distancia)); 
+            distancia = llenarDistancia(idColaboradorRegistrado, idSucursal);
+            txt_distancia.setText(Double.toString(distancia));
 
             btn_agregarColaborador.setEnabled(true);
-        }
-        else{
+        } else {
             txt_distancia.setText("Distancia");
         }
     }//GEN-LAST:event_cmb_colaboradoresActionPerformed
@@ -1354,25 +1320,25 @@ public class Viajes extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_colaboradoresMousePressed
 
     private void cmb_sucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_sucursalesActionPerformed
-        if(cmb_sucursales.getItemCount() ==0){
+        if (cmb_sucursales.getItemCount() == 0) {
             return;
         }
-        if(txt_distanciaTotal.getText().equals("0")){
+        if (txt_distanciaTotal.getText().equals("0")) {
             txt_total.setText("0");
         }
 
-        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){
+        if (!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")) {
             txt_distancia.setText("Distancia");
             limpiarColaboradores();
             String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
             String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
             String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
-            String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
+            String[] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
             nombreSucursal = partesInformacionSucursal[0].trim();
             llenarColaboradoresPorSucursal(nombreSucursal);
             cmb_colaboradores.setEnabled(true);
             idSucursal = capturarIdSucursal(nombreSucursal);
-        }else{
+        } else {
             cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
             cmb_colaboradores.setEnabled(false);
             txt_distancia.setText("Distancia");
@@ -1384,11 +1350,11 @@ public class Viajes extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_sucursalesMousePressed
 
     private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-        if(facturaActiva){
-            JOptionPane.showMessageDialog(null, "No puede regresar mientras un viaje activo, si desea salir, presione cancelar.","Viaje activo",JOptionPane.INFORMATION_MESSAGE);
+        if (facturaActiva) {
+            JOptionPane.showMessageDialog(null, "No puede regresar mientras un viaje activo, si desea salir, presione cancelar.", "Viaje activo", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        
+
         try {
             this.dispose();
             Principal principal;
@@ -1397,38 +1363,26 @@ public class Viajes extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Viajes.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
-    private void lbl_fechaViajeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_fechaViajeMousePressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lbl_fechaViajeMousePressed
-
-    private void jdt_fechaViajeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaViajeMousePressed
-        JOptionPane.showMessageDialog(null, "Click","Viaje activo",JOptionPane.INFORMATION_MESSAGE);    
-
-    }//GEN-LAST:event_jdt_fechaViajeMousePressed
-
     private void jdt_fechaViajeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaViajeMouseEntered
-        if(jdt_fechaViaje.getCalendar()!=null){
+        if (jdt_fechaViaje.getCalendar() != null) {
             lbl_iniciar.setEnabled(true);
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_jdt_fechaViajeMouseEntered
 
     private void jdt_fechaViajeMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jdt_fechaViajeMouseExited
-        if(jdt_fechaViaje.getCalendar()!=null){
+        if (jdt_fechaViaje.getCalendar() != null) {
             lbl_iniciar.setEnabled(true);
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_jdt_fechaViajeMouseExited
 
     private void cmb_transportistasMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cmb_transportistasMouseEntered
-        if(jdt_fechaViaje.getCalendar()==null){
-                JOptionPane.showMessageDialog(rootPane, "Por favor, seleccione una fecha","Fecha necesaria",JOptionPane.INFORMATION_MESSAGE);
-            }
-        // TODO add your handling code here:
+        if (jdt_fechaViaje.getCalendar() == null) {
+            JOptionPane.showMessageDialog(rootPane, "Por favor, seleccione una fecha", "Fecha necesaria", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_cmb_transportistasMouseEntered
 
     /**

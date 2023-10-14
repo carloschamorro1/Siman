@@ -1,0 +1,14 @@
+1. Ejecute el archivo "script.sql"
+2. Ingrese a SQL Server Management Studio.
+3. Seleccione la base de datos que acaba de crear que se llama "siman".
+4. Haga clic derecho en la base de datos y seleccione la opción "Task" y luego "Backup"
+Es necesario tener un backup inicial para poder restablecer la base de datos.
+5. Verifique los datos y presione ok.
+6. Nuevamente seleccione la base de datos "siman".
+7. Haga clic derecho en la base de datos y seleccione la opción "Task", después "Restore" y por último Database.
+8. Seleccione “Device”.
+9. Haga clic en el botón con 3 puntos para seleccionar el archivo "siman.bak".
+10. Presione el botón “add”.
+11. Busque el archivo "siman.bak" ubicado en la carpeta "sql" del proyecto.
+11. Verifique que tanto en “source” como en “destination” las bases de datos seleccionadas sean "siman"
+12. Presione "OK".

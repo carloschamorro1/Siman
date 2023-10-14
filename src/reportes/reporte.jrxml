@@ -32,7 +32,8 @@ inner join colaboradores as c
 on c.id_colaborador = vd.id_colaborador
 inner join transportistas as t
 on ve.id_transportista = t.id_transportista
-where t.id_transportista = $P{idTransportista} and fecha_viaje between $P{fechaInicialBD} and $P{fechaFinalBD}]]>
+where t.id_transportista = $P{idTransportista} and fecha_viaje between $P{fechaInicialBD} and $P{fechaFinalBD}
+order by ve.fecha_viaje asc]]>
 	</queryString>
 	<field name="fecha_viaje" class="java.sql.Date"/>
 	<field name="nombre_colaborador" class="java.lang.String"/>

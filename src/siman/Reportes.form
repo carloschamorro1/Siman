@@ -283,11 +283,6 @@
                   <Font name="Segoe UI" size="20" style="0"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaInicialMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaInicialMouseExited"/>
-                <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaInicialMousePressed"/>
-              </Events>
             </Component>
             <Component class="com.toedter.calendar.JDateChooser" name="jdt_fechaFinal">
               <Properties>
@@ -296,11 +291,6 @@
                   <Font name="Segoe UI" size="20" style="0"/>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaFinalMouseEntered"/>
-                <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaFinalMouseExited"/>
-                <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jdt_fechaFinalMousePressed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="lbl_fechaInicial">
               <Properties>

@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -39,7 +38,8 @@ public class Asignaciones extends javax.swing.JFrame {
     int idColaboradorActivo;
 
     /**
-     * Creates new form Sucursales
+     * Creates new form Asignaciones
+     *
      * @param nombreUsuario
      * @param idColaborador
      * @throws java.sql.SQLException
@@ -63,23 +63,23 @@ public class Asignaciones extends javax.swing.JFrame {
         desactivarCampos();
         this.con = ConexionBD.obtenerConexion();
     }
-    
-    public void desactivarCampos(){
+
+    public void desactivarCampos() {
         cmb_colaboradores.setEnabled(false);
         txt_distancia.setEnabled(false);
         btn_asignar.setEnabled(false);
     }
-    
-    public void activarCampos(){
+
+    public void activarCampos() {
         cmb_colaboradores.setEnabled(true);
         txt_distancia.setEnabled(true);
         btn_asignar.setEnabled(true);
     }
-    
-    public void activarCamposSinDistancia(){
+
+    public void activarCamposSinDistancia() {
         cmb_colaboradores.setEnabled(true);
         btn_asignar.setEnabled(true);
-        
+
     }
 
     private void informacionGeneral() {
@@ -92,7 +92,7 @@ public class Asignaciones extends javax.swing.JFrame {
         PlaceHolder holder;
         holder = new PlaceHolder(txt_distancia, Color.gray, Color.black, "Ingrese la distancia", false, "Roboto", 25);
     }
-    
+
     private void llenarSucursales() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -104,74 +104,74 @@ public class Asignaciones extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private void limpiarColaboradores(){
+
+    private void limpiarColaboradores() {
         cmb_colaboradores.removeAllItems();
         cmb_colaboradores.addItem("Seleccione al colaborador");
     }
-     
-    public int capturarIdColaborador(String numeroIdentidad){
+
+    public int capturarIdColaborador(String numeroIdentidad) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '"+numeroIdentidad+"'";
+            String sql = "select id_colaborador from colaboradores where numero_identidad_colaborador = '" + numeroIdentidad + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_colaborador"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
-    public String capturarNombreColaborador(int id_colaborador){
+
+    public String capturarNombreColaborador(int id_colaborador) {
         try {
             Statement st = con.createStatement();
-            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '"+id_colaborador+"'";
+            String sql = "select nombre_colaborador, apellido_colaborador from colaboradores where id_colaborador = '" + id_colaborador + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 nombreColaborador = rs.getString("nombre_colaborador") + " " + rs.getString("apellido_colaborador");
                 return nombreColaborador;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return "";
+        return "";
     }
-    
-    private String capturarNombreSucursal(int id_sucursal){
+
+    private String capturarNombreSucursal(int id_sucursal) {
         try {
             Statement st = con.createStatement();
-            String sql = "select nombre_sucursal from sucursales where id_sucursal = '"+id_sucursal+"'";
+            String sql = "select nombre_sucursal from sucursales where id_sucursal = '" + id_sucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 nombreSucursal = rs.getString("nombre_sucursal");
                 return nombreSucursal;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return "";
+        return "";
     }
-    
-    private int capturarIdSucursal(String nombreSucursal){
+
+    private int capturarIdSucursal(String nombreSucursal) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_sucursal from sucursales where nombre_sucursal = '"+nombreSucursal+"'";
+            String sql = "select id_sucursal from sucursales where nombre_sucursal = '" + nombreSucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_sucursal"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
+
     private void llenarColaboradores() {
         ArrayList<String> lista = new ArrayList<String>();
         try {
@@ -183,7 +183,6 @@ public class Asignaciones extends javax.swing.JFrame {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-  
 
     private boolean estaVacio() {
         if (txt_distancia.getText().equals("Ingrese la distancia")) {
@@ -192,13 +191,12 @@ public class Asignaciones extends javax.swing.JFrame {
         }
         return false;
     }
-    
+
     private boolean validarDistancia() {
         if (Double.parseDouble(txt_distancia.getText()) == 0) {
             JOptionPane.showMessageDialog(this, "La distancia no puede ser cero (0).", "Cero no permitido", JOptionPane.ERROR_MESSAGE);
             return true;
-        }
-        else if (Double.parseDouble(txt_distancia.getText()) > 50) {
+        } else if (Double.parseDouble(txt_distancia.getText()) > 50) {
             JOptionPane.showMessageDialog(this, "La distancia no puede ser mayor a cincuenta (50).", "Máximo de la distancia", JOptionPane.ERROR_MESSAGE);
             txt_distancia.setText("");
             txt_distancia.requestFocus();
@@ -219,19 +217,18 @@ public class Asignaciones extends javax.swing.JFrame {
         desactivarCampos();
     }
 
-    public boolean sucursalYaAsignadaAColaborador(){
+    public boolean sucursalYaAsignadaAColaborador() {
         try {
             Statement st = con.createStatement();
-            String sql = "select * from asignaciones where id_colaborador = '"+idColaborador+"' and id_sucursal = '"+idSucursal+"'";
+            String sql = "select * from asignaciones where id_colaborador = '" + idColaborador + "' and id_sucursal = '" + idSucursal + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 JOptionPane.showMessageDialog(null, "El colaborador ya tiene asignada esta sucursal", "Sucursal ya asignada", JOptionPane.INFORMATION_MESSAGE);
                 txt_distancia.setText("");
                 txt_distancia.setEnabled(false);
                 cmb_colaboradores.setSelectedItem("Seleccione al colaborador");
                 return true;
-            }
-            else{
+            } else {
                 return false;
             }
         } catch (SQLException ex) {
@@ -239,8 +236,6 @@ public class Asignaciones extends javax.swing.JFrame {
         }
         return false;
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -486,17 +481,15 @@ public class Asignaciones extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_asignarMouseExited
 
     private void lbl_homeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_homeMousePressed
-
         try {
             this.dispose();
             Principal principal;
             principal = new Principal(lbl_nombreUsuario.getText(), idColaboradorActivo);
             principal.setVisible(true);
-            
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_homeMousePressed
 
@@ -514,116 +507,108 @@ public class Asignaciones extends javax.swing.JFrame {
             if (estaVacio()) {
                 return;
             }
-            
-            if(validarDistancia()){
+
+            if (validarDistancia()) {
                 return;
             }
-            
-            if(sucursalYaAsignadaAColaborador()){
+
+            if (sucursalYaAsignadaAColaborador()) {
                 return;
             }
-            
+
             PreparedStatement ps;
             ResultSet rs;
-
-            ps = con.prepareStatement("INSERT INTO asignaciones (id_colaborador, id_sucursal, distancia) " +
-                                       "VALUES(?,?,?)");
+            ps = con.prepareStatement("INSERT INTO asignaciones (id_colaborador, id_sucursal, distancia) "
+                    + "VALUES(?,?,?)");
             ps.setInt(1, idColaborador);
             ps.setInt(2, idSucursal);
             ps.setDouble(3, Double.parseDouble(txt_distancia.getText().trim()));
-           
             int res = ps.executeUpdate();
             if (res > 0) {
                 nombreColaborador = capturarNombreColaborador(idColaborador);
                 nombreSucursal = capturarNombreSucursal(idSucursal);
-                JOptionPane.showMessageDialog(this, "Se ha asigando la distancia: " +txt_distancia.getText().trim()
-                        + "km a el/la empleado/a: " + nombreColaborador + " en la sucursal: " + nombreSucursal +".");
+                JOptionPane.showMessageDialog(this, "Se ha asigando la distancia: " + txt_distancia.getText().trim()
+                        + "km a el/la empleado/a: " + nombreColaborador + " en la sucursal: " + nombreSucursal + ".");
                 restablecer();
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
-
-        // TODO add your handling code here:
     }//GEN-LAST:event_btn_asignarActionPerformed
 
     private void txt_distanciaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_distanciaKeyTyped
-        char a=evt.getKeyChar();
-        
-        if(evt.getKeyChar() == 46){
-            if(txt_distancia.getText().equals("")){
+        char a = evt.getKeyChar();
+        if (evt.getKeyChar() == 46) {
+            if (txt_distancia.getText().equals("")) {
                 evt.consume();
                 Toolkit.getDefaultToolkit().beep();
                 return;
             }
-            if(txt_distancia.getText().contains(".")){
+            if (txt_distancia.getText().contains(".")) {
                 evt.consume();
                 Toolkit.getDefaultToolkit().beep();
                 return;
             }
         }
-        
-        
-        if(txt_distancia.getText().length() >=5){
+
+        if (txt_distancia.getText().length() >= 5) {
             evt.consume();
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos","Límite de entrada",JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        if (evt.getKeyChar() == 8 || evt.getKeyChar() == 127 ||
-            evt.getKeyChar() == 0 || evt.getKeyChar() == 3 || evt.getKeyChar() == 22
-            || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 44 || evt.getKeyChar() == 46) {
+            JOptionPane.showMessageDialog(null, "Número máximo de dígitos admitidos", "Límite de entrada", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
 
-        if(Character.isLetter(a) || !Character.isLetterOrDigit(a)){
+        if (evt.getKeyChar() == 8 || evt.getKeyChar() == 127
+                || evt.getKeyChar() == 0 || evt.getKeyChar() == 3 || evt.getKeyChar() == 22
+                || evt.getKeyChar() == 26 || evt.getKeyChar() == 24 || evt.getKeyChar() == 44 || evt.getKeyChar() == 46) {
+            return;
+        }
+
+        if (Character.isLetter(a) || !Character.isLetterOrDigit(a)) {
             evt.consume();
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Sólo numeros","Restricción de entrada",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Sólo numeros", "Restricción de entrada", JOptionPane.ERROR_MESSAGE);
         }
-        // TODO add your handling code here:
     }//GEN-LAST:event_txt_distanciaKeyTyped
 
     private void cmb_sucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_sucursalesActionPerformed
         limpiarColaboradores();
-        
-        if(!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")){
-                activarCamposSinDistancia();
-                String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
-                String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
-                String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
-                String [] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
-                String nombreSucursal = partesInformacionSucursal[0].trim();
-                llenarColaboradores();
-                idSucursal = capturarIdSucursal(nombreSucursal);
-            }else{
+
+        if (!cmb_sucursales.getSelectedItem().toString().equals("Seleccione la sucursal")) {
+            activarCamposSinDistancia();
+            String informacionSucursal = cmb_sucursales.getSelectedItem().toString();
+            String reemplazarInformacionSucursal = informacionSucursal.replace("(", "|");
+            String informacionSucursalFormateada = reemplazarInformacionSucursal.replace(")", "|");
+            String[] partesInformacionSucursal = informacionSucursalFormateada.split("\\|");
+            String nombreSucursal = partesInformacionSucursal[0].trim();
+            llenarColaboradores();
+            idSucursal = capturarIdSucursal(nombreSucursal);
+        } else {
             restablecer();
         }
     }//GEN-LAST:event_cmb_sucursalesActionPerformed
 
     private void cmb_colaboradoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_colaboradoresActionPerformed
-        if(cmb_colaboradores.getItemCount() ==0){
+        if (cmb_colaboradores.getItemCount() == 0) {
             return;
         }
-        if(!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")){
+        if (!cmb_colaboradores.getSelectedItem().toString().equals("Seleccione al colaborador")) {
             txt_distancia.setEnabled(true);
             String informacionColaboradores = cmb_colaboradores.getSelectedItem().toString();
-            String [] partesInformacionSucursal = informacionColaboradores.split("\\|");
+            String[] partesInformacionSucursal = informacionColaboradores.split("\\|");
             String numeroIdentidad = partesInformacionSucursal[1].trim();
             idColaborador = capturarIdColaborador(numeroIdentidad);
-            }
-        else{
+        } else {
             txt_distancia.setEnabled(false);
         }
     }//GEN-LAST:event_cmb_colaboradoresActionPerformed
 
     private void lbl_sucursal1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_sucursal1MousePressed
-        // TODO add your handling code here:
+        cmb_sucursales.requestFocus();
     }//GEN-LAST:event_lbl_sucursal1MousePressed
 
     private void lbl_limpiarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_limpiarMouseClicked
         restablecer();
-        // TODO add your handling code here:
     }//GEN-LAST:event_lbl_limpiarMouseClicked
 
     /**

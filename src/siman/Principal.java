@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -25,20 +24,21 @@ public class Principal extends javax.swing.JFrame {
 
     /**
      * Creates new form Principal
+     *
      * @param nombreUsuario
      */
     int idColaboradorActivo;
     boolean esGerente;
     Connection con = null;
- 
-    public Principal(String nombreUsuario, int idColaborador) throws SQLException{
+
+    public Principal(String nombreUsuario, int idColaborador) throws SQLException {
         initComponents();
         informacionGeneral();
         lbl_nombreUsuario.setText(nombreUsuario);
         btn_viajes.setVisible(false);
         this.idColaboradorActivo = idColaborador;
         this.con = ConexionBD.obtenerConexion();
-        if(esGerente(idColaborador)){
+        if (esGerente(idColaborador)) {
             btn_viajes.setVisible(true);
         }
     }
@@ -49,29 +49,29 @@ public class Principal extends javax.swing.JFrame {
         btn_viajes.setVisible(false);
         this.con = ConexionBD.obtenerConexion();
     }
-    
-     public final void informacionGeneral(){
+
+    public final void informacionGeneral() {
         this.setTitle("Menú Principal");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
     }
-     
-    public boolean esGerente(int colaborador){
+
+    public boolean esGerente(int colaborador) {
         try {
             Statement st = con.createStatement();
-            String sql = "select id_colaborador from colaboradores as c " +
-                         "join puestos as p " +
-                         "on c.id_puesto = p.id_puesto " +
-                         "where p.puesto = 'Gerente de tienda'";
+            String sql = "select id_colaborador from colaboradores as c "
+                    + "join puestos as p "
+                    + "on c.id_puesto = p.id_puesto "
+                    + "where p.puesto = 'Gerente de tienda'";
             ResultSet rs = st.executeQuery(sql);
-            while(rs.next()){
+            while (rs.next()) {
                 int idColaborador = rs.getInt("id_colaborador");
-                    if(idColaborador == colaborador){
-                        esGerente = true;
-                        return esGerente;
-                    }else{
-                         esGerente = false;
-                    }
+                if (idColaborador == colaborador) {
+                    esGerente = true;
+                    return esGerente;
+                } else {
+                    esGerente = false;
+                }
             }
             return esGerente;
         } catch (SQLException ex) {
@@ -273,17 +273,15 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_asignacionesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMouseEntered
-        btn_asignaciones.setBackground(new Color(156,2,91));
-        // TODO add your handling code here:
+        btn_asignaciones.setBackground(new Color(156, 2, 91));
     }//GEN-LAST:event_btn_asignacionesMouseEntered
 
     private void btn_asignacionesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMouseExited
-        btn_asignaciones.setBackground(new Color(205,63,145));
-        // TODO add your handling code here:
+        btn_asignaciones.setBackground(new Color(205, 63, 145));
     }//GEN-LAST:event_btn_asignacionesMouseExited
 
     private void btn_asignacionesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_asignacionesMousePressed
-        btn_asignaciones.setBackground(new Color(40,74,172));
+        btn_asignaciones.setBackground(new Color(40, 74, 172));
         try {
             Asignaciones asignaciones = new Asignaciones(lbl_nombreUsuario.getText(), idColaboradorActivo);
             this.dispose();
@@ -294,17 +292,15 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_asignacionesMousePressed
 
     private void btn_reportesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_reportesMouseEntered
-        btn_reportes.setBackground(new Color(156,2,91));
-        // TODO add your handling code here:
+        btn_reportes.setBackground(new Color(156, 2, 91));
     }//GEN-LAST:event_btn_reportesMouseEntered
 
     private void btn_reportesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_reportesMouseExited
-        btn_reportes.setBackground(new Color(205,63,145));
-        // TODO add your handling code here:
+        btn_reportes.setBackground(new Color(205, 63, 145));
     }//GEN-LAST:event_btn_reportesMouseExited
 
     private void btn_reportesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_reportesMousePressed
-        btn_reportes.setBackground(new Color(40,74,172));
+        btn_reportes.setBackground(new Color(40, 74, 172));
         try {
             Reportes reportes = new Reportes(lbl_nombreUsuario.getText(), idColaboradorActivo);
             this.dispose();
@@ -315,17 +311,17 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_reportesMousePressed
 
     private void btn_viajesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_viajesMouseEntered
-        btn_viajes.setBackground(new Color(156,2,91));
+        btn_viajes.setBackground(new Color(156, 2, 91));
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_viajesMouseEntered
 
     private void btn_viajesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_viajesMouseExited
-        btn_viajes.setBackground(new Color(205,63,145));
+        btn_viajes.setBackground(new Color(205, 63, 145));
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_viajesMouseExited
 
     private void btn_viajesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_viajesMousePressed
-        btn_viajes.setBackground(new Color(40,74,172));
+        btn_viajes.setBackground(new Color(40, 74, 172));
         Viajes viaje;
         try {
             viaje = new Viajes(lbl_nombreUsuario.getText(), idColaboradorActivo);
@@ -334,14 +330,13 @@ public class Principal extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
-    
     }//GEN-LAST:event_btn_viajesMousePressed
 
     private void lbl_cerrarSesionMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_cerrarSesionMousePressed
-        Object[] opciones = {"Sí","No"};
+        Object[] opciones = {"Sí", "No"};
         lbl_cerrarSesion.setIcon(new javax.swing.ImageIcon("C:\\Users\\cmcha\\Documents\\NetBeansProjects\\BaleadasHermanas\\BaleadasHermanas\\src\\Img\\cerrar-sesion-rojo.png"));
-        if(JOptionPane.showOptionDialog(null,"¿Está seguro/a que desea cerrar sesión?","Confirmación de cerrar sesión",
-                   JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,opciones,opciones[0])==JOptionPane.YES_OPTION){ 
+        if (JOptionPane.showOptionDialog(null, "¿Está seguro/a que desea cerrar sesión?", "Confirmación de cerrar sesión",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]) == JOptionPane.YES_OPTION) {
             Login login = null;
             try {
                 login = new Login();
@@ -350,7 +345,7 @@ public class Principal extends javax.swing.JFrame {
             }
             this.dispose();
             login.setVisible(true);
-        }  
+        }
         // TODO add your handling code here:
     }//GEN-LAST:event_lbl_cerrarSesionMousePressed
 

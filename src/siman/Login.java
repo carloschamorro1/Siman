@@ -26,60 +26,55 @@ import org.apache.commons.codec.digest.DigestUtils;
  * @author Carlos
  */
 public class Login extends javax.swing.JFrame {
+
     Connection con;
     int click = 0;
     int clickContraseñaOlvidada = 0;
     int idColaboradorActivo;
-    
+
     /**
      * Creates new form Login
      */
     public Login() throws SQLException {
-       init();
-       this.con = ConexionBD.obtenerConexion();
+        init();
+        this.con = ConexionBD.obtenerConexion();
     }
-    
-    
-   
-   public void init(){
+
+    public void init() {
         initComponents();
         holders();
         informacionGeneral();
-   } 
-    
-    public void informacionGeneral(){
+    }
+
+    public void informacionGeneral() {
         this.setTitle("Login");
         this.setLocationRelativeTo(null);
         this.setIconImage(new ImageIcon(getClass().getResource("../Img/icono.png")).getImage());
     }
-    
-    public int capturarIdColaboradorPorNombreUsuario(String nombreUsuario){
+
+    public int capturarIdColaboradorPorNombreUsuario(String nombreUsuario) {
         int id;
         try {
             Statement st = con.createStatement();
-            String sql = "select id_colaborador from usuarios where nombre_usuario = '"+nombreUsuario+"'";
+            String sql = "select id_colaborador from usuarios where nombre_usuario = '" + nombreUsuario + "'";
             ResultSet rs = st.executeQuery(sql);
-            if(rs.next()){
+            if (rs.next()) {
                 id = Integer.parseInt(rs.getString("id_colaborador"));
                 return id;
             }
         } catch (SQLException ex) {
             Logger.getLogger(Asignaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
-       return -1;
+        return -1;
     }
-    
 
-    public void holders(){
-        PlaceHolder placeHolder = new PlaceHolder(txt_usuario,Color.gray,Color.black,"Usuario",false,"Roboto",25);
-        PlaceHolder placeHolder1 = new PlaceHolder(txt_password,Color.gray,Color.black,"Password",false,"Roboto",25);
+    public void holders() {
+        PlaceHolder placeHolder = new PlaceHolder(txt_usuario, Color.gray, Color.black, "Usuario", false, "Roboto", 25);
+        PlaceHolder placeHolder1 = new PlaceHolder(txt_password, Color.gray, Color.black, "Password", false, "Roboto", 25);
     }
-    
-    public boolean isEmpty(){
-        if("".equals(txt_usuario.getText()) || "Password".equals(txt_password.getText()))
-        return true;
-        else
-            return false; 
+
+    public boolean isEmpty() {
+        return "".equals(txt_usuario.getText()) || "Password".equals(txt_password.getText());
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -114,11 +109,6 @@ public class Login extends javax.swing.JFrame {
         lbl_titulo.setText("Acceso");
 
         txt_usuario.setFont(new java.awt.Font("Roboto", 0, 20)); // NOI18N
-        txt_usuario.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_usuarioActionPerformed(evt);
-            }
-        });
 
         btn_ingresar.setBackground(new java.awt.Color(205, 63, 145));
         btn_ingresar.setFont(new java.awt.Font("Roboto Black", 0, 24)); // NOI18N
@@ -250,27 +240,27 @@ public class Login extends javax.swing.JFrame {
 
     private void lbl_vercontraseñaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_vercontraseñaMouseClicked
         click++;
-        if(click%2 != 0){
+        if (click % 2 != 0) {
 
             lbl_vercontraseña.setIcon(new javax.swing.ImageIcon("src\\Img\\ojo.png"));
-            txt_password.setEchoChar((char)0);
-        }else{
+            txt_password.setEchoChar((char) 0);
+        } else {
             lbl_vercontraseña.setIcon(new javax.swing.ImageIcon("src\\Img\\ojo-cerrado.png"));
             txt_password.setEchoChar('*');
         }
     }//GEN-LAST:event_lbl_vercontraseñaMouseClicked
 
     private void lbl_contraseñaOlvidadaMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseExited
-        if(clickContraseñaOlvidada==0){
+        if (clickContraseñaOlvidada == 0) {
             lbl_contraseñaOlvidada.setForeground(Color.black);
         }
-        if(clickContraseñaOlvidada>=1){
+        if (clickContraseñaOlvidada >= 1) {
             lbl_contraseñaOlvidada.setForeground(Color.blue);
         }
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseExited
 
     private void lbl_contraseñaOlvidadaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseEntered
-        lbl_contraseñaOlvidada.setForeground(new Color(205,63,145));
+        lbl_contraseñaOlvidada.setForeground(new Color(205, 63, 145));
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseEntered
 
     private void lbl_contraseñaOlvidadaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_contraseñaOlvidadaMouseClicked
@@ -279,53 +269,48 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_contraseñaOlvidadaMouseClicked
 
     private void btn_ingresarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_ingresarMousePressed
-        btn_ingresar.setBackground(new Color(40,74,172));
-        try{
+        btn_ingresar.setBackground(new Color(40, 74, 172));
+        try {
             String usuario = txt_usuario.getText();
             char[] c = txt_password.getPassword();
-            String passwordFinal ="";
+            String passwordFinal = "";
             for (int i = 0; i < c.length; i++) {
-                passwordFinal  += String.valueOf(c[i]);
+                passwordFinal += String.valueOf(c[i]);
             }
-            String passwordEncriptada=DigestUtils.md5Hex(passwordFinal);
-            String sql = "SELECT * from usuarios where nombre_usuario ='" +usuario+ "' and password_usuario='"+passwordEncriptada+"' COLLATE Latin1_General_CS_AS";
+            String passwordEncriptada = DigestUtils.md5Hex(passwordFinal);
+            String sql = "SELECT * from usuarios where nombre_usuario ='" + usuario + "' and password_usuario='" + passwordEncriptada + "' COLLATE Latin1_General_CS_AS";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
-            if(isEmpty()){
+            if (isEmpty()) {
                 getToolkit().beep();
                 JOptionPane.showMessageDialog(null, "Por favor llene todos los campos.", "Ingrese sus datos", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            if(rs.next()){
+            if (rs.next()) {
                 idColaboradorActivo = capturarIdColaboradorPorNombreUsuario(txt_usuario.getText());
                 this.dispose();
-                Principal principal = new Principal(txt_usuario.getText(),idColaboradorActivo);
+                Principal principal = new Principal(txt_usuario.getText(), idColaboradorActivo);
                 principal.setVisible(true);
-            }
-            else{
+            } else {
                 Toolkit.getDefaultToolkit().beep();
                 txt_password.setText("");
                 JOptionPane.showMessageDialog(null, "El nombre de usuario o contraseña no coinciden", "Las credenciales no concuerdan", JOptionPane.ERROR_MESSAGE);
             }
 
-        }catch(Exception e){
-                 JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } 
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btn_ingresarMousePressed
 
     private void btn_ingresarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_ingresarMouseExited
-        btn_ingresar.setBackground(new Color(205,63,145));
+        btn_ingresar.setBackground(new Color(205, 63, 145));
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_ingresarMouseExited
 
     private void btn_ingresarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btn_ingresarMouseEntered
-        btn_ingresar.setBackground(new Color(156,2,91));
+        btn_ingresar.setBackground(new Color(156, 2, 91));
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_ingresarMouseEntered
-
-    private void txt_usuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_usuarioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_usuarioActionPerformed
 
     /**
      * @param args the command line arguments
@@ -336,15 +321,14 @@ public class Login extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try{
+        try {
             UIManager.setLookAndFeel(new FlatIntelliJLaf());
-            UIManager.put( "Button.arc", 35 );
-        }catch(Exception e){
+            UIManager.put("Button.arc", 35);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         //</editor-fold>
 
-        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             try {
