@@ -1,0 +1,8 @@
+1. Ubique el paquete "bd".
+2. Abra el archivo ConexionBD.java.
+3. Colóquese en la línea 23 del código.
+4. De ser necesario cambie el usuario con el que ingresa en el servidor SQL en la parte donde dice "user"
+después del signo igual (=), muy importante no eliminar el punto y coma (;) del final de la línea.
+5. Colóquese en la línea 24 del código.
+6. Cambie la contraseña en la parte donde dice "password" después del signo igual (=), muy importante no eliminar el punto y coma (;) del final de la línea.
+ATENCION: La contraseña quedará en el código como texto plano.
